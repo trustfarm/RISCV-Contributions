@@ -1,4 +1,4 @@
-# AME MAC Dataformat and MAC workloads profile v0.14_1 — Proposals
+# AME MAC Dataformat and MAC workloads profile v0.15_b — Proposals
 
 > - Author : KyuTae Ahn (trustfarm.info@gmail.com , cpplover@trustfarm.net) 
 > - Licenses : 
@@ -86,22 +86,22 @@ Notes:
 
 | Width   | Code         | Type           | Notes                            |
 | ------- | ------------ | -------------- | -------------------------------- |
-| default | 0x00         | **INT8**       | Default (lane basic)             |
+| default | 0x00         | **INT8**       | **Default** (lane basic)             |
 |    -    |    -         |  -             | -                                |
 | 4bits   | 0x01         | **INT4**       | 4-bit 2’s complement             |
-|         | 0x02         | **FP4 sE2M1**  | FP8 Default (sign,2 exp,1 mant) |
+|         | 0x02         | **FP4 sE2M1**  | **FP4 Default** (sign,2 exp,1 mant) |
 |         | 0x03         | **FP4 sE1M2**  | MX-style (sign, 1 exp, 2 mant) |
 |         | 0x04         | **UF4 E2M2**   | unsigned microscaling            |
 |         | 0x05         | **UF4 E1M3**   | unsigned microscaling            |
 |   -     |    -         |   -            |   -                              |
-| 6bits   | 0x06         | **FP6 sE3M2**  | FP6 default                      |
+| 6bits   | 0x06         | **FP6 sE3M2**  | **FP6 Default**                    |
 |         | 0x07         | **FP6 sE2M3**  | FP6 (range ↓,mant ↑)             |
 |         | 0x08         | **FP6 sE4M1**  | FP6 (range ↑, mant ↓)            |
 |         | 0x09         | **UF6 E4M2**   | unsigned microscaling            |
 |         | 0x0A–0x0F    | RESERVED       | reserved for future use          |
 |   -     |    -         |   -            |   -                              |
-| 8bits   | 0x10         | **INT8**       | 8-bit signed integer             |
-|         | 0x11         | **FP8 sE4M3**  | FP8 Default (sign, 4 exp, 3 mant)|
+| 8bits   | 0x10         | **INT8**       | **8-bit signed** integer             |
+|         | 0x11         | **FP8 sE4M3**  | **FP8 Default** (sign, 4 exp, 3 mant)|
 |         | 0x12         | **FP8 sE5M2**  | FP8 Alter (sign, 5 exp, 2 mant)  |
 |         | 0x13         | **UE8 E8M0**   | unsigned FP (8 exp, 8 mant)      |
 |         | 0x14         | **Q4.3**       | fixed-point sINT4+3MANT          |
@@ -109,27 +109,27 @@ Notes:
 |         | 0x16–0x17    | RESERVED       | 8-bit Reserved                   |
 |   -     |    -         |   -            |   -                              |
 | 12bits  | 0x18         | **INT12**      | 12-bit signed integer            |
-|         | 0x19         | **FP12 sE5M6** | FP12 Default                     |
+|         | 0x19         | **FP12 sE5M6** | **FP12 Default**                   |
 |         | 0x1A         | **FP12 sE4M7** | FP12 (range ↓,mant ↑)            |
 |         | 0x1B         | **Q4.8**       | fixed-point sINT4+8MANT          |
 |         | 0x1C         | **Q5.7**       | fixed-point sINT5+7MANT          |
 |         | 0x1D–0x1F    | RESERVED       | 12-bit Reserved                  |
 |   -     |    -         |   -            |   -                              |
 | 16bits  | 0x20         | **INT16**      | 16-bit signed integer            |
-|         | 0x28         | **FP16**       | IEEE half precision (sE5M10)     |
-|         | 0x29         | **BF16**       | bfloat16  (sE8M7)                |
+|         | 0x28         | **FP16**       | **IEEE half precision (sE5M10)**   |
+|         | 0x29         | **BF16**       | **bfloat16  (sE8M7)**                |
 |         | 0x2A         | **UF16 E8M8**  | unsigned FP16  (E8M8)            |
 |         | 0x2B         | **Q8.8**       | fixed-point sINT8+8MANT          |
 |         | 0x2C–0x2F | RESERVED    | 16-bit Reserved                  |
 |   -     |    -         |   -            |   -                              |
 | 32bits  | 0x40         | **INT32**      | 32-bit signed integer            |
-|         | 0x48         | **FP32**       | IEEE single precision (sE8M23)   |
+|         | 0x48         | **FP32**       | **IEEE single precision (sE8M23)**   |
 |         | 0x49         | **TF32**       | NVIDIA-style TF32  (sE8M10)      |
 |         | 0x4A         | **Q16.16**     | fixed-point sINT16+16MANT        |
 |         | 0x4B–0x4F | RESERVED    | 32-bit Reserved                  |
 |   -     |    -         |   -            |   -                              |
 | 64bits  | 0x80         | **INT64**      | 64-bit signed integer            |
-|         | 0x88         | **FP64**       | IEEE double precision (sE11M52)  |
+|         | 0x88         | **FP64**       | **IEEE double precision (sE11M52)**  |
 |         | 0x8A         | **Q32.32**     | fixed-point sINT32+32MANT        |
 |         | 0x8B–0x8F | RESERVED    | 64-bit Reservered                 |
 |   -     |    -         |   -            |   -                              |

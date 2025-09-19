@@ -1,0 +1,77 @@
+digraph TRF_Access {
+  rankdir=TB;
+  labelloc="t";
+  label="Tile Register File (TRF) 2R/1W Access Flow (32 tiles × 256B, ≥2R/1W)";
+
+  node [shape=box, style=rounded, fontname="Helvetica"];
+
+  // ===== Frontend / Issue =====
+  subgraph cluster_issue {
+    label="Frontend / Issue";
+    style=dashed; color=gray;
+
+    AID  [label="A tile ID\n(R0)"];
+    BID  [label="B tile ID\n(R1)"];
+    CID  [label="C tile ID\n(W)"];
+
+    R0AGU [label="AGU(R0)\nrow/col/stride"];
+    R1AGU [label="AGU(R1)\nrow/col/stride"];
+    WAGU  [label="AGU(W)\nrow/col/stride"];
+
+    AID -> R0AGU;
+    BID -> R1AGU;
+    CID -> WAGU;
+  }
+
+  // ===== TRF Banking =====
+  subgraph cluster_trf {
+    label="TRF (Multi-bank)\n32 tiles × 256B = 8KB";
+    style=filled; color=lightgray;
+
+    DEC   [label="Bank Decoder / Interleave\nbank = (tile_id mod NBANKS)"];
+
+    subgraph cluster_banks {
+      label="Banks (example: NBANKS=4)";
+      style=rounded; color=white;
+
+      B0 [label="Bank0\nTiles: t0,t4,t8,..."];
+      B1 [label="Bank1\nTiles: t1,t5,t9,..."];
+      B2 [label="Bank2\nTiles: t2,t6,t10,..."];
+      B3 [label="Bank3\nTiles: t3,t7,t11,..."];
+    }
+  }
+
+  // ===== Compute Unit =====
+  subgraph cluster_mac {
+    label="Tile MAC Array";
+    style=rounded; color=lightyellow;
+
+    MAC [label="MAC Cell(s)\nconsume: R0,R1\nproduce: W"];
+  }
+
+  OUT [label="C tile update\n(Writeback to TRF)", shape=box, style="rounded,filled", fillcolor=white];
+
+  // ===== Dataflow edges =====
+  // Read address -> TRF
+  R0AGU -> DEC [label="addr(R0)"];
+  R1AGU -> DEC [label="addr(R1)"];
+  WAGU  -> DEC [label="addr(W)"];
+
+  // Decoder -> Banks
+  DEC -> B0 [label="bank sel"]; DEC -> B1; DEC -> B2; DEC -> B3;
+
+  // Banks -> MAC (two reads)
+  B0 -> MAC [label="R0/R1 data", style=solid];
+  B1 -> MAC [label="R0/R1 data", style=solid];
+  B2 -> MAC [label="R0/R1 data", style=solid];
+  B3 -> MAC [label="R0/R1 data", style=solid];
+
+  // MAC -> TRF (one write)
+  MAC -> OUT [label="W data", style=bold];
+
+  // ===== Notes =====
+  NOTE1 [shape=note, label="≥2R/1W per cycle:\nA,B tiles read in parallel (R0,R1)\nC tile accumulated (W)"];
+  NOTE2 [shape=note, label="Conflict-free via banking & AGU:\nR0,R1,W go to different banks ideally.\nIf collide, internal mux/1-cycle skid."];
+
+  {rank=same; NOTE1; NOTE2;}
+}

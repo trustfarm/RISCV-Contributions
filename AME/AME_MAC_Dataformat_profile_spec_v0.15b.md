@@ -1,4 +1,4 @@
-# AME MAC Dataformat and MAC workloads profile v0.15_b — Proposals
+# AME MAC Dataformat and MAC workloads profile v0.15_ba — Proposals
 
 > - Author : KyuTae Ahn (trustfarm.info@gmail.com , cpplover@trustfarm.net) 
 > - Licenses : 
@@ -314,7 +314,7 @@ MMACC.T tC0, tA0, tB0, 0
 ---
 
 ## 10. HW Notes
-1. **Banking & Ports**: 32 tiles × 256B each ⇒ 8KB (8/16/32-bit modes). Provide ≥2R/1W ports per bank for 2×2.  
+1. **Banking & Ports**: 32 tiles × 256B each ⇒ 8KB (8/16/32-bit modes). Provide ≥2R/1W ports per bank for 2×2 (See [Appendix ](#appendix-c-tile-register-file-trf-banking--port-semantics) for details).
 2. **Throughput tiers**: 1k..32k MACs/cycle map to 64B..512B/cycle read BW as discussed in the thread.  
 3. **Store scheduling**: For 4×4 guarded mode, ensure writeback slots avoid RF spill; otherwise guard falls back.  
 4. **Cache hints**: Stream/non-temporal stores for C.  
@@ -709,4 +709,46 @@ digraph ScalingPolicy {
 ```
 
 ---
+
+## Appendix C. Tile Register File (TRF) Banking & Port Semantics
+
+**Banking & Ports: 32 tiles × 256B each ⇒ 8KB (8/16/32-bit modes). Provide ≥2R/1W**
+
+### 1. Capacity
+- **Tile size**: 256B  
+- **Total tiles**: 32 ⇒ `32 × 256B = 8192B = 8KB`  
+- **Element layouts**:
+  - 8-bit mode  → 16×16 = 256 elements/tile
+  - 16-bit mode → 16×8  = 128 elements/tile
+  - 32-bit mode → 16×4  = 64 elements/tile
+
+### 2. Port Requirements
+- **≥2R/1W**: at least **two reads + one write per cycle**
+  - **Why?** GEMM/GEMV requires:
+    - Read **A tile** + **B tile** simultaneously → **2R**
+    - Write/accumulate into **C tile** → **1W**
+  - This matches the core compute pattern `C = A × B`
+
+### 3. Banking Architecture
+- Direct single-bank SRAM would cause conflicts.  
+- Solution: **multi-bank partitioning** (e.g., 4 banks × 8 tiles each).  
+- Address Generation Unit (AGU) & bank decoders ensure:
+  - Conflict-free parallel access
+  - Deterministic latency for 2R/1W issue
+
+### 4. Why Not More Ports?
+- >2R/1W (e.g., 4R/2W) increases area, wiring, and energy cost.  
+- ≥2R/1W is the **sweet spot** for matrix multiply workloads:
+  - Sufficient to cover one multiply-accumulate step per cycle
+  - Balanced against silicon cost
+
+---
+
+### 5. Reference Flow charts.
+
+![TRF Flowchart](TRF_Access.svg)
+
+**Summary:**  
+The TRF must sustain **2 simultaneous reads** (for operands A and B) and **1 write** (for result C) every cycle.  
+This guarantees that tile-level GEMM operations are not starved by register file bandwidth, while keeping the design scalable and cost-efficient.
 

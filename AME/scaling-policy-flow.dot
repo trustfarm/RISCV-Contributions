@@ -1,0 +1,14 @@
+// **Scaling Policy Flow:** This diagram illustrates how the compiler/runtime selects the tiling mode and parallel cell count for GEMM workloads based on throughput targets and datatype constraints.
+digraph ScalingPolicy {
+  rankdir=TB; node [shape=box, style=rounded];
+  P[label="Target MACs/cyc"];
+  C[label="Cells P = pick(macs)\n(16/64/128)"];
+  W[label="Choose (Mb,Nb,Kb)\nby elem width"];
+  G[label="Guard 4×4?\n(out≤16b && tiles≤32)"];
+  M[label="Mode=4×4"];
+  F[label="Mode=2×2\nmx.guard_fallback=1"];
+  S[label="Schedule P cells\n(loop over tiles)\nDouble-buffer I/O"];
+  P->C->W->G;
+  G->M[label="yes"]; G->F[label="no"];
+  M->S; F->S;
+}

@@ -1,0 +1,37 @@
+digraph ScalingFlow {
+  /* Use top-to-bottom layout globally so cluster internals are vertical.
+     We'll place clusters side-by-side using invisible anchor nodes and a
+     same-rank group. */
+  rankdir=TB; node [shape=box, style=rounded];
+
+  /* anchors declared at top-level to avoid cluster/rank conflicts */
+  host_anchor [style=invis, width=0, height=0];
+  core_anchor [style=invis, width=0, height=0];
+
+  subgraph cluster_host {
+    label="Host/Runtime";
+    A[label="GEMM(M,N,K)\n(Ft, bOVF, bTR)"];
+    B[label="Partitioner\nblock M_b×N_b×K_b\n(tile sizes: 16×{8,16,4,2})"];
+    C[label="Scheduler\n(target MACs/cyc,\nparallel cells,\ndouble-buffering)"];
+    A->B->C;
+  }
+
+  subgraph cluster_core {
+    label="AME Core (Tile RF + MAC Units)";
+    D[label="Tile Loader\n(L0 buf, prefetch)"];
+    E[label="Dispatch Fabric\n(4×4 cells × P)\nP=16/64/128 ..."];
+    F[label="Accumulator RF\n(C tiles: INT16/FP32)"];
+    G[label="Storeback\n(coalesce, stream)"];
+    D->E->F->G;
+  }
+
+  /* Force the cluster anchors to be on the same rank so clusters appear side-by-side */
+  { rank = same; host_anchor; core_anchor }
+
+  /* connect global anchors into cluster internals (invisible edges) */
+  host_anchor -> A [style=invis];
+  core_anchor -> D [style=invis];
+
+  C->D[label="blocks"];
+  F->C[label="partial-sum status", dir=back];
+}

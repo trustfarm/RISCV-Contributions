@@ -1,0 +1,12 @@
+digraph Guard4x4 {
+  rankdir=LR; node [shape=box, style=rounded];
+  start [label="Request 4×4"];
+  w [label="out_width ≤ 16b ?"];
+  t [label="result_tiles ≤ 32 ?"];
+  ok [label="Enable 4×4"];
+  no [label="Fallback to 2×2\nset guard_fallback"];
+  start -> w -> t;
+  t -> ok [label="yes"];
+  w -> no [label="no"];
+  t -> no [label="no"];
+}

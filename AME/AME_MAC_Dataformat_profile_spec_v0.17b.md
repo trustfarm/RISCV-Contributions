@@ -360,6 +360,7 @@ MMACC.T  tC_base, tA_base, tB_base, imm
 
 ### Abbreviations
 - **RF**: Register File  
+- **MMACC**: Matrix Multiply–ACCumulate
 - **MAC**: Multiply–Accumulate  
 - **GEMM**: General Matrix Multiply  
 - **CSR**: Control & Status Register  

@@ -763,9 +763,11 @@ digraph ScalingPolicy {
 The TRF must sustain **2 simultaneous reads** (for operands A and B) and **1 write** (for result C) every cycle.  
 This guarantees that tile-level GEMM operations are not starved by register file bandwidth, while keeping the design scalable and cost-efficient.
 
+**Note:**
+While the internal design may leverage asynchronous DMA-like feeding to sustain bandwidth, Scalability is captured by cells_parallel = P and TRF’s ≥2R/1W port guarantee.
+
 ** More detailed Scaling Flow for overall system wide expansion flow
 ![ScalingFlow_Noted](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/ScalingFlow_note.svg)
-
 
 ## TODOs
 

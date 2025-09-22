@@ -4,7 +4,11 @@
 > - Licenses : 
 >      - Apache2.0, CC BY 4.0, 
 >      - Additionally licensed under MIT for use in RISC-V, OpenRISC, and OSS TPU platforms
+>
 > - History : 
+>   - Sep.22, 2025 svg link refers github link, for manage 1 copy of this md file
+>   - Sep.21, 2025 int8,int16 reference materials link updates V0.16
+>   - Sep.19, 2025 Adds Appendix tile operations more detailed 2R/1W
 >   - Sep.19, 2025 Scaling tile MAC pseudocode view of SoC design profile V0.15
 >   - Sep.18, 2025 Refinement of Dataformat view of SoC design profile V0.13
 >   - Sep.18, 2025 AME MAC procedure and Dataformat profile V0.12
@@ -152,9 +156,10 @@ Notes:
   - VNS** : Vendor Specific use purpose
   - FP8*  : Default [sE4M3] - Nvidia [Recipes for Pre-training LLMs with MXFP8](https://arxiv.org/pdf/2506.08027)
   - INT8 : Qualcomm - [FP8 versus INT8 for efficient deep learning inference.](https://ar5iv.labs.arxiv.org/html/2303.17951)
-  - INT16 : Intel [MIXED PRECISION TRAINING OF CNN USING INT](https://arxiv.org/pdf/1802.00930) ,  
-            Facebook [OSS FBGEMM](https://engineering.fb.com/2018/11/07/ml-applications/fbgemm/) ,
-            SemiconEngineering [Data Formats For Inference On The Edge](https://semiengineering.com/data-formats-for-inference-on-the-edge/)
+  - INT16 : 
+    - Intel [MIXED PRECISION TRAINING OF CNN USING INT](https://arxiv.org/pdf/1802.00930) ,  
+    - Facebook [OSS FBGEMM](https://engineering.fb.com/2018/11/07/ml-applications/fbgemm/) ,
+    - SemiconEngineering [Data Formats For Inference On The Edge](https://semiengineering.com/data-formats-for-inference-on-the-edge/)
   - UE8M0 : [OCP Microscaling Formats (MX) Specification](https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf)
   and [IEEE WG P3109 Interim report v3](https://github.com/P3109/Public/blob/main/IEEE%20WG%20P3109%20Interim%20Report%20v3.pdf)
   - E8M8 : Extended from UE8M0 [Trustfarm TFSDxr](https://github.com/trustfarm/TFSDxr-Neuron-Quantization/blob/main/docs/tfsd_quant/README_en.md)
@@ -426,7 +431,7 @@ This section refines the tiling description for hardware implementers.
 ## 14. Proposal: AME MAC Accumulation Policy and Scalability for Large GEMM/LLM Workloads
 
 ### 1. Accumulation Type for INT8
-The previous suggestion of **INT8×INT8 → INT32 accumulate** is unnecessarily complex for hardware:
+The previous suggestion of **INT8×INT8 → INT32 accumulate** is unnecessarily complex for hardware and consume double accumulate RF memory size:
 
 - **Drawbacks of INT32 accumulate**:  
   - Large accumulator/register file width.  
@@ -436,7 +441,10 @@ The previous suggestion of **INT8×INT8 → INT32 accumulate** is unnecessarily 
 - **Simplified alternative (recommended):**  
   - **INT8×INT8 → INT16 accumulate** when `bOVF=0` (full accumulate).  
   - **INT8×INT8 → INT8 accumulate** when `bOVF=1` (overflow ignore).  
-  - This matches the approach refered from [Google TPU AQE (INT8->BF16 or INT32)](https://cloud.google.com/blog/products/compute/accurate-quantized-training-aqt-for-tpu-v5e), and [INTEL AVX or AVX-512](https://www.intel.com/content/www/us/en/docs/onednn/developer-guide-reference/2025-1/nuances-of-int8-computations.html)
+  - This approach refered from 
+    - [Google TPU AQE (INT8->BF16 or INT32)](https://cloud.google.com/blog/products/compute/accurate-quantized-training-aqt-for-tpu-v5e), 
+    - [Google LiteRT now supports a “16×8” quantization mode: weights in INT8, activations in INT16.](https://ai.google.dev/edge/litert/models/post_training_integer_quant_16x8)
+    - and [INTEL AVX or AVX-512](https://www.intel.com/content/www/us/en/docs/onednn/developer-guide-reference/2025-1/nuances-of-int8-computations.html)
 
 **Conclusion:** INT16 accumulation is sufficient in practice. INT32 accumulation only adds hardware burden without real benefits.
 
@@ -512,13 +520,14 @@ Recent industry and research directions highlight why **INT8→INT16** or **BF16
 **Conclusion:**  
 - For inference, **INT8 weights with INT16 accumulations** are sufficient and increasingly popular.  
 - For LLM workloads, **BF16/FP16 inputs with FP32 accumulation** remain the stable and dominant approach.  
-- INT32 accumulation is not the industry baseline and should not be enforced in AME.
+- INT32 accumulation is inefficient on view of SoC , should not be enforced in AME.
+- Latest Quantization and Activation method should applied and tested on VNS , it moves to next level of main profile include new formats(INT32,...).
 
 
 
 ### 13.A  Scaling Flow (DOT)
 
-![Scaling Flow](ScalingFlow.svg)
+![Scaling Flow](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/ScalingFlow.svg)
 
 
 ```dot
@@ -688,7 +697,7 @@ static inline uint8_t select_tiling_44(uint8_t GUARD4x4,
 
 ### 14.B  Scaling Policy Flow (DOT)
 
-![Scaling Policy Flow](scaling-policy-flow.svg)
+![Scaling Policy Flow](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/scaling-policy-flow.svg)
 
 
 ```dot
@@ -746,9 +755,22 @@ digraph ScalingPolicy {
 
 ### 5. Reference Flow charts.
 
-![TRF Flowchart](TRF_Access.svg)
+
+![TRF Flowchart](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/TRF_Access.svg)
+
 
 **Summary:**  
 The TRF must sustain **2 simultaneous reads** (for operands A and B) and **1 write** (for result C) every cycle.  
 This guarantees that tile-level GEMM operations are not starved by register file bandwidth, while keeping the design scalable and cost-efficient.
+
+** More detailed Scaling Flow for overall system wide expansion flow
+![ScalingFlow_Noted](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/ScalingFlow_note.svg)
+
+
+## TODOs
+
+### 1. Modify and Expand bOVF for flexible output target Formats.
+### 2. Extend DMAlike operation for Huge LLM MUT operation with given Tiles.
+### 3. Redefine ISA for supports MAC Signature and DMAlike operation.
+
 

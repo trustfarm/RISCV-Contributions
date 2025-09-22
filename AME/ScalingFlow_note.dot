@@ -1,0 +1,43 @@
+digraph ScalingFlow_note {
+  rankdir=TB;
+  node [shape=box, style=rounded, fontname="Helvetica"];
+
+  // Input Path
+  DRAM [label="External DRAM/HBM"];
+  DMA  [label="Async DMA Engine\n(prefetch, double-buffer)"];
+  RF   [label="Tile Register File (TRF)\n32 tiles × 256B = 8KB"];
+
+  // MAC Cluster
+  subgraph cluster_mac {
+    label="Tile MAC Array (scalable)";
+    style=filled; color=lightgray;
+
+    MAC0 [label="Tile-MAC Cell 0"];
+    MAC1 [label="Tile-MAC Cell 1"];
+    MACx [label="Tile-MAC Cell ..."];
+    MACn [label="Tile-MAC Cell P-1"];
+
+    MAC0 -> MAC1 [label="systolic feed"];
+    MAC1 -> MACx [label="..."];
+    MACx -> MACn [label="..."];
+  }
+
+  OUT [label="Result Spill\n(DRAM or RF)"];
+
+  // Dataflow
+  DRAM -> DMA;
+  DMA  -> RF [label="prefetch (optional)"];
+  DMA  -> MAC0 [label="direct stream"];
+  RF   -> MAC0 [style=dotted, label="cached feed"];
+
+  MAC0 -> OUT;
+  MAC1 -> OUT;
+  MACx -> OUT;
+  MACn -> OUT;
+
+  // Notes
+  NOTE1 [shape=note, label="cells_parallel = P\n(#MAC tiles active in parallel)"];
+  NOTE2 [shape=note, label="TRF ports ≥2R/1W sustained\n(see Appendix C)"];
+
+  {rank=same; NOTE1; NOTE2;}
+}

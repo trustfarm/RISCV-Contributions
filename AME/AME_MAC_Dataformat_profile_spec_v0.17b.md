@@ -1,4 +1,4 @@
-# AME MAC Dataformat and MAC workloads profile v0.17a — Proposals
+# AME MAC Dataformat and MAC workloads profile v0.17b — Proposals
 
 > - Author : KyuTae Ahn (trustfarm.info@gmail.com , cpplover@trustfarm.net) 
 > - Licenses : 
@@ -6,6 +6,7 @@
 >      - Additionally licensed under MIT for use in RISC-V, OpenRISC, and OSS TPU platforms
 >
 > - History : 
+>   - Sep.23, 2025 Future Extensions about DMA operations v0.17b
 >   - Sep.23, 2025 IFmt->OFmt Mapping Policy Appendix v0.17a
 >   - Sep.22, 2025 **bOVF → RFmt (Result Format, 8-bit)** and **Ft → IFmt (Input Format, 8-bit)**; Resolution rules expanded v0.17
 >   - Sep.22, 2025 svg link refers github link, for manage 1 copy of this md file
@@ -99,6 +100,9 @@ Notes:
 
 - **`Qe.m` fixed‑point ops** allowed up to **16bits** in baseline; wider Q formats are extensions.
 
+> #### ** Refer Current Allowed and NTE IFmt -> OFmt Mapping [Appendix A](#appendix-a-ifmt-to-rfmt-mapping-policy)
+
+
 ---
 
 
@@ -167,6 +171,7 @@ Notes:
 > - `IFmt=FP8` (0x11 or 0x12), `RFmt=FP16` (0x28) ⇒ A,B: FP8, C: FP16 (rounding mode - **RND via CSR**)
 > - `IFmt=FP16` (0x28), `RFmt=FP32` (0x48) ⇒ A,B: FP16, C: FP32
 
+
 ---
 
 - ### Format Comments and References
@@ -189,6 +194,8 @@ Notes:
   - [Low-bit Model Quantization for Deep Neural Networks: A Survey](https://arxiv.org/html/2505.05530v1)
     
 ---
+
+
 ## 5. Unified Tile Register File & Tile Geometry
 
 - 32 unified tile registers. Each tile stores `M` rows (default 16), `K` columns determined by element width.  
@@ -362,7 +369,7 @@ MMACC.T  tC_base, tA_base, tB_base, imm
 ---
 
 ## 9. HW Notes
-1. **Banking & Ports**: 32 tiles × 256B each ⇒ 8KB (8/16/32-bit modes). Provide ≥2R/1W ports per bank for 2×2 (See [Appendix ](#appendix-c-tile-register-file-trf-banking--port-semantics) for details).
+1. **Banking & Ports**: 32 tiles × 256B each ⇒ 8KB (8/16/32-bit modes). Provide ≥2R/1W ports per bank for 2×2 (See [Appendix B](#appendix-b-tile-register-file-trf-banking--port-semantics) for details).
 2. **Throughput tiers**: 1k..32k MACs/cycle map to 64B..512B/cycle read BW as discussed in the thread.  
 3. **Store scheduling**: For 4×4 guarded mode, ensure writeback slots avoid RF spill; otherwise guard falls back.  
 4. **Cache hints**: Stream/non-temporal stores for C.  
@@ -519,7 +526,7 @@ The earlier suggestion of **INT8×INT8 → INT32 accumulate** is unnecessarily c
 - 16k MAC/cycle  → ~64 parallel cells  
 - 32k MAC/cycle  → ~128 parallel cells  
 
-This keeps the ISA simple, leverages the existing unified TRF (2R/1W ports, [Appendix ](#appendix-c-tile-register-file-trf-banking--port-semantics)), and provides a clear scaling path for LLM workloads where BF16/FP16 inputs accumulate into FP32.
+This keeps the ISA simple, leverages the existing unified TRF (2R/1W ports, [Appendix B TRF PortMapping](#5-trf-reference-flow-charts), and provides a clear scaling path for LLM workloads where BF16/FP16 inputs accumulate into FP32.
 
 ---
 ### 3. LLM Workload Considerations
@@ -531,7 +538,7 @@ Large Language Models (LLMs) impose specific requirements:
 
 **Implications for AME:**
 1. **Tile-level multiply:** `FP16`/`BF16` tiles (16×16) with `FP32` accumulate.  
-2. **Accumulator capacity:** Tile register file must support `FP32` results without frequent spills (see [**Appendix  TRF banking & ports**](#appendix-c-tile-register-file-trf-banking--port-semantics) ).  
+2. **Accumulator capacity:** Tile register file must support `FP32` results without frequent spills (see [**Appendix B TRF banking & ports**](#6-trf-system-wide-flow-charts)).  
 3. **Parallel scheduling:** Large GEMM kernels (≥1k×1k) are constructed by looping and dispatching multiple 4×4 cells, with **partial-sum synchronization**.  
 4. **ISA simplicity:** ISA defines only the tile cell and accumulation semantics. **Large-matrix decomposition is handled by compiler/runtime**, not the instruction itself.  
 
@@ -773,7 +780,7 @@ digraph ScalingPolicy {
 
 ---
 
-## Appendix A. IFmt → RFmt Mapping Policy
+## Appendix A. IFmt to RFmt Mapping Policy
 
 This table summarizes **allowed / disallowed / deferred** combinations of input (IFmt) and result (RFmt) formats.  
 It provides implementers and compiler writers with a quick view of what accumulations are valid in the current AME MAC profile (v0.17).
@@ -836,11 +843,14 @@ It provides implementers and compiler writers with a quick view of what accumula
 
 ---
 
-### 5. Reference Flow charts.
+### 5. TRF Reference Flow charts.
 
-
+** The Register File Access Flow (multitiles operations
+)
 ![TRF Flowchart](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/TRF_Access.svg)
 
+
+### 6. TRF-System-wide Flow charts.
 
 ** More detailed Scaling Flow for overall system wide expansion flow
 ![ScalingFlow_Noted](https://raw.githubusercontent.com/trustfarm/RISCV-Contributions/main/AME/ScalingFlow_note.svg)
@@ -853,6 +863,25 @@ Even for `FP32` accumulation in LLM workloads, **2R/1W** covers one `A×B` **fet
 
 **Note:**
 While the internal design may leverage asynchronous DMA-like feeding to sustain bandwidth, Scalability is captured by **`cells_parallel = P and TRF’s ≥2R/1W`** port guarantee.
+
+### 7. Future Extensions
+
+While ≥2R/1W ports are sufficient for base GEMM workloads, future SoC/LLM-class accelerators may benefit from optional extensions:
+
+- **Background DMA Prefetch**  
+  - Async DMA engine streams data from DRAM/HBM directly into TRF banks.  
+  - Hides latency and reduces explicit RF read pressure.  
+  - Especially useful for large GEMM (≥1k) where tile reloads are frequent.  
+
+- **Split-Bank Write Combining**  
+  - Allow partial sums from multiple MAC arrays to write into different banks concurrently.  
+  - Mitigates write hotspots when accumulators are wide (e.g., FP32).  
+
+- **Bank Conflict Prediction / Scheduling**  
+  - Compiler/runtime can query TRF bank mapping to schedule tile allocation in a conflict-free manner.  
+  - Avoids stalls without requiring wider porting.  
+
+> These are **not part of the base AME v0.17 profile**, but may be adopted in vendor-specific (VNS) implementations or future AME revisions.
 
 
 ## TODOs

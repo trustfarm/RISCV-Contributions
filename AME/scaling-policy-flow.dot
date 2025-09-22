@@ -11,4 +11,6 @@ digraph ScalingPolicy {
   P->C->W->G;
   G->M[label="yes"]; G->F[label="no"];
   M->S; F->S;
+  note[label="2R/1W sustained\nTRF banking", shape=note, style=dashed]
+  S->note;
 }

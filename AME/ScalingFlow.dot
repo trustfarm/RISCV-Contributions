@@ -10,7 +10,7 @@ digraph ScalingFlow {
 
   subgraph cluster_host {
     label="Host/Runtime";
-    A[label="GEMM(M,N,K)\n(Ft, bOVF, bTR)"];
+    A[label="GEMM(M,N,K)\n(IFmt, RFmt, bTR)"];
     B[label="Partitioner\nblock M_b×N_b×K_b\n(tile sizes: 16×{8,16,4,2})"];
     C[label="Scheduler\n(target MACs/cyc,\nparallel cells,\ndouble-buffering)"];
     A->B->C;

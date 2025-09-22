@@ -23,9 +23,9 @@
 <!-- A -->
 <g id="node3" class="node">
 <title>A</title>
-<path fill="none" stroke="black" d="M138.12,-340.5C138.12,-340.5 53.88,-340.5 53.88,-340.5 47.88,-340.5 41.88,-334.5 41.88,-328.5 41.88,-328.5 41.88,-311.5 41.88,-311.5 41.88,-305.5 47.88,-299.5 53.88,-299.5 53.88,-299.5 138.12,-299.5 138.12,-299.5 144.12,-299.5 150.12,-305.5 150.12,-311.5 150.12,-311.5 150.12,-328.5 150.12,-328.5 150.12,-334.5 144.12,-340.5 138.12,-340.5"/>
+<path fill="none" stroke="black" d="M145.25,-340.5C145.25,-340.5 46.75,-340.5 46.75,-340.5 40.75,-340.5 34.75,-334.5 34.75,-328.5 34.75,-328.5 34.75,-311.5 34.75,-311.5 34.75,-305.5 40.75,-299.5 46.75,-299.5 46.75,-299.5 145.25,-299.5 145.25,-299.5 151.25,-299.5 157.25,-305.5 157.25,-311.5 157.25,-311.5 157.25,-328.5 157.25,-328.5 157.25,-334.5 151.25,-340.5 145.25,-340.5"/>
 <text xml:space="preserve" text-anchor="middle" x="96" y="-323.2" font-family="Times New Roman,serif" font-size="14.00">GEMM(M,N,K)</text>
-<text xml:space="preserve" text-anchor="middle" x="96" y="-306.7" font-family="Times New Roman,serif" font-size="14.00">(Ft, bOVF, bTR)</text>
+<text xml:space="preserve" text-anchor="middle" x="96" y="-306.7" font-family="Times New Roman,serif" font-size="14.00">(IFmt, RFmt, bTR)</text>
 </g>
 <!-- host_anchor&#45;&gt;A -->
 <!-- core_anchor -->

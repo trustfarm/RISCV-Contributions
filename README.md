@@ -9,7 +9,9 @@ This repository includes several documents and materials for RISC-V contribution
 >      - Apache2.0, CC BY 4.0, 
 >      - Additionally licensed under MIT for use in RISC-V, OpenRISC, and OSS TPU platforms
 
-
+---
+## [AME MAC Dataformat profile proposal v0.16](AME/AME_MAC_Dataformat_profile_spec_v0.16.md)
+---
 ## [AME MAC Dataformat profile proposal v0.15b](AME/AME_MAC_Dataformat_profile_spec_v0.15b.md)
 
 

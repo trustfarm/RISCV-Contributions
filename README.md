@@ -10,6 +10,9 @@ This repository includes several documents and materials for RISC-V contribution
 >      - Additionally licensed under MIT for use in RISC-V, OpenRISC, and OSS TPU platforms
 
 ---
+
+# AME Section
+---
 ## [AME MAC Dataformat profile proposal v0.17c](AME/AME_MAC_Dataformat_profile_spec_v0.17c.md)
 ---
 ## [AME MAC Dataformat profile proposal v0.17b](AME/AME_MAC_Dataformat_profile_spec_v0.17b.md)
@@ -18,4 +21,17 @@ This repository includes several documents and materials for RISC-V contribution
 ---
 ## [AME MAC Dataformat profile proposal v0.15b](AME/AME_MAC_Dataformat_profile_spec_v0.15b.md)
 
+---
+
+# PQC Section
+
+---
+## [PQC_ISA_Security_patch_spec proposal draft_v0.1 (EN)](PQC/PQC_ISA_security_patch_spec_v0_1_EN.md)
+## [PQC_ISA_Security_patch_spec proposal draft_v0.1 (KO)](PQC/PQC_ISA_security_patch_spec_v0_1_KO.md)
+
+---
+## PQC Draft NTT section 
+    
+  - [PQC_ISA_NTT_Development draft v0_3](PQC/Kyber_NTT_ISA_Integration_v0_3.md)
+  
 

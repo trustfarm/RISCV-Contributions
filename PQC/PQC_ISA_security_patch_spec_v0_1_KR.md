@@ -62,6 +62,12 @@
 
 ---
 
+### PQC Scramble / DeScramble DataPath Flowchart
+
+![PQC Scramble Flowchart](PQC_Scramble.svg)
+
+---
+
 ## 3. Functional ISA Logic (기능적 ISA 로직)
 
 보안 위협과 변조 위협에 대응하기 위해 기능적 ISA 로직은 **I/O를 simplehash 기반으로 스크램블(scramble)** 하고, `register file` 혹은 `scratchpad`를 사용하여 `CRYPTOENGINE`에 안전하게 데이터를 전달하는 패턴을 채택합니다.

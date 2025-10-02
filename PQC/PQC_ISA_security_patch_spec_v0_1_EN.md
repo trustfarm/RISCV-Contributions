@@ -59,6 +59,13 @@ Security goals prioritized here:
 
 ❗  More detailed in 👉 [Appendix Tamper Threat Model](tamper_appendix_EN.md)
 
+---
+
+### PQC Scramble / DeScramble DataPath Flowchart
+
+![PQC Scramble Flowchart](PQC_Scramble.svg)
+
+
 ## 3. Functional ISA Logic
 
 Make Functional ISA logic , to resist Security Threat and Tamper Threat, adopt **`IO has scramble by simplehash`** and use `register file or scratchpad` to `CRYPTOENGINE`

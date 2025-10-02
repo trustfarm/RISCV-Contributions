@@ -1,0 +1,91 @@
+digraph PQC_Scramble {
+    // ===== Graph style =====
+    rankdir="TB";
+    nodesep=0.7;
+    ranksep=0.7;
+    bgcolor="#ffffff";
+    label="Flowchart: FNV-1a Scramble / Descramble Path";
+    labelloc=top; fontsize=16; fontname="NanumGothic Bold";
+
+    // ===== Node defaults =====
+    node [shape=box, style="rounded,filled", fontsize=11, fontname="NanumGothic", fillcolor="#ffffff"];
+    edge [arrowsize=0.8, penwidth=1.2];
+
+    // ===== Control source =====
+    RNG_FNV [label="Hash <= FNV-1a (RNG or Data)\nHash Generator", fillcolor="#eef7ff"];
+
+    // ===== I/O cluster =====
+    subgraph cluster_IO {
+        label="Data I/O RAM";
+        style="rounded"; color="#2b88d8"; penwidth=1.4;
+        bgcolor="#e8f7fc"; // light blue
+
+        InputData  [label="Input Data",  fillcolor="#ffffff"];
+        OutputData [label="Output Data", fillcolor="#ffffff"];
+    }
+
+    // ===== Scratchpad cluster =====
+    subgraph cluster_scratch {
+        label="Scratchpad SRAM or RegisterFile (for synchronous operation)";
+        style="rounded"; color="#2b88d8"; penwidth=1.4;
+        bgcolor="#e8f7fc";
+
+        XOR_Scrambler_IN   [label="XOR Scrambler (IN)\n(Data ⊕ Hash)", fillcolor="#f7f7ff"];
+        Scratchpad_IN      [label="Scratchpad RAM (IN)\n(Holds Scrambled Data & Hash pair)", fillcolor="#fff8e6"];
+
+        Scratchpad_OUT     [label="Scratchpad RAM (OUT)\n(Holds Scrambled Data & Hash pair)", fillcolor="#fff8e6"];
+        XOR_Scrambler_OUTRAM [label="XOR Scrambler (OUT)\n(Data ⊕ Hash)", fillcolor="#f7f7ff"];
+    }
+
+
+    // ===== PQC cluster =====
+    subgraph cluster_pqc {
+        label="PQC Cluster";
+        style="rounded"; color="#8a8a8a"; penwidth=1.2;
+        bgcolor="#f6f6f6";
+        XOR_DeScrambler_IN   [label="XOR (de)Scrambler (IN)\n(Data ⊕ Hash)", fillcolor="#f7f7ff"];
+
+        PQC_Engine     [label="PQC Engine\n(De)Scramble(InputData)\nSync Logic", fillcolor="#f2fff0"];
+        PQC_Primitives [label="PQC Primitives\n(For NTT, Poly Ops, etc.)", fillcolor="#f2fff0"];
+        XOR_Scrambler_OUT [label="XOR Scrambler (OUT)\n(Data ⊕ Hash)", fillcolor="#f7f7ff"];
+    }
+
+    // ===== Data path (black dashed) =====
+    InputData         -> XOR_Scrambler_IN     [color=black, style=dashed, label=" data "];
+    XOR_Scrambler_IN  -> Scratchpad_IN        [color=black, style=dashed];
+    Scratchpad_IN     -> PQC_Engine           [color=black, style=dashed];
+    PQC_Engine         -> XOR_DeScrambler_IN [color=black, style=dashed, label=" descramble "];
+    XOR_DeScrambler_IN -> PQC_Primitives       [color=black, style=dashed, label=" data "];
+    PQC_Primitives    -> XOR_Scrambler_OUT    [color=black, style=dashed, label=" result "];
+    XOR_Scrambler_OUT -> Scratchpad_OUT       [color=black, style=dashed];
+    Scratchpad_OUT    -> XOR_Scrambler_OUTRAM [color=black, style=dashed];
+    XOR_Scrambler_OUTRAM -> OutputData        [color=black, style=dashed];
+
+    // ===== Control path (blue dotted) =====
+    RNG_FNV -> XOR_Scrambler_IN     [color="#2b88d8", style=dotted, label=" control: hash stream "];
+    RNG_FNV -> XOR_Scrambler_OUT    [color="#2b88d8", style=dotted];
+    RNG_FNV -> XOR_DeScrambler_IN [color="#2b88d8", style=dotted];
+    RNG_FNV -> XOR_Scrambler_OUTRAM [color="#2b88d8", style=dotted];
+
+    // ===== Optional exception (red solid) =====
+    // 예: 해시/IV 동기화 오류 시 스크래치 재동기화
+    // PQC_Engine -> Scratchpad_IN [color="#e03a3a", style=dotted, label=" sync/hash mismatch "];
+
+// ===== Tiny legend as TB notes =====
+    subgraph cluster_legend {
+        label="Legend";
+        style="rounded"; color="#888888"; penwidth=1.0;
+        bgcolor="#f9f9f9";
+    rank=same;
+    node [shape=note, fontsize=10, fontname="NanumGothic"];
+    LegendTitle [label="Legend", shape=plaintext, fontsize=12, fontname="NanumGothic Bold"];
+
+    L1 [label="Data path = black dashed", fillcolor="#ffffff"];
+    L2 [label="Control = blue dotted",    fillcolor="#eef7ff"];
+    L3 [label="Exception = red solid",    fillcolor="#ffeeee"];
+
+    L1 -> L2 -> L3 [style=invis];
+    }
+}
+
+

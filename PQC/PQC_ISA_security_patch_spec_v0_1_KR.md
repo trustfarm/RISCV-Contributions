@@ -1,5 +1,5 @@
 
-# PQC ISA — 보안 & 패치 가능성 사양 (초안) v0.1 (KR)
+# PQC ISA — 보안 & 패치 가능성 사양 v0.11 (KR)
 
 ---
 [KO](PQC_ISA_security_patch_spec_v0_1_KR.md) | [EN](PQC_ISA_security_patch_spec_v0_1_EN.md) 
@@ -7,7 +7,9 @@
 
 - 작성자: KyuTae Ahn (trustfarm.info@gmail.com, cpplover@trustfarm.net)  
 - 라이선스: Apache-2.0, CC BY 4.0 (RISC-V/OpenRISC/OSS Security 플랫폼에 대해 MIT 추가)  
-- 이력: Oct 01, 2025 — Draft v0.1
+- 이력: 
+  - Oct 03,2025 - Append Scramble Flowchart and AES-CTR mode for reference   v0.11
+  - Oct 01, 2025 — Draft v0.1
 
 ---
 ## 목적 (Purpose)
@@ -63,6 +65,15 @@
 ---
 
 ### PQC Scramble / DeScramble DataPath Flowchart
+
+Scramble 하는 이유는 Sidechannel attack 대응할때, 기존 RAM 에서 데이터 fetch 시에  scatter-gatter 방식보다, **Scrambling/Shuffling 이 데이터 누출방지 및 보안성에서 높아지기 때문입니다**. 매우적은 HW Resource 와 latency-less 를 우선하기 때문에 `FNV-1a` simple hash 알고리즘을 채택하였습니다.  
+만약 더높은 보안성 강화목적이라면, 똑같은 블록에 `AES256` 또는 `ChaCha` 같은 알고리즘을 채용해도 됩니다.
+
+운영방식은 기존의 **AES-CTR (CounterMode)** 를 참조하고, AES 대신 `FNV-1a` 로 해시엔진을 변경하면 됩니다.
+
+![AES CTR(Counter) operation](references/aes-ctrmode-ex.jpg)
+
+> **PQC Scramble Flowchart w/FNV-1a**
 
 ![PQC Scramble Flowchart](PQC_Scramble.svg)
 

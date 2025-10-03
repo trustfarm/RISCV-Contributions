@@ -1,4 +1,4 @@
-# PQC ISA — Security & Patchability Specification (Draft) v0.1 
+# PQC ISA — Security & Patchability Specification v0.11 
 
 ---
 [KO](PQC_ISA_security_patch_spec_v0_1_KR.md) | [EN](PQC_ISA_security_patch_spec_v0_1_EN.md) 
@@ -6,7 +6,9 @@
 
 - Author: KyuTae Ahn (trustfarm.info@gmail.com, cpplover@trustfarm.net)  
 - License: Apache-2.0, CC BY 4.0 (additional MIT for RISC-V/OpenRISC/OSS Security platforms)  
-- History: Oct 01, 2025 — Draft v0.1 
+- History: 
+  - Oct 03,2025 - Append Scramble Flowchart and AES-CTR mode for reference   v0.11
+  - Oct 01, 2025 — Draft v0.1 
 
 ---
 
@@ -62,6 +64,16 @@ Security goals prioritized here:
 ---
 
 ### PQC Scramble / DeScramble DataPath Flowchart
+
+Scrambling is adopted as a countermeasure against side-channel attacks because, compared with scatter-gather style fetches from conventional RAM, **scrambling/shuffling provides stronger protection against data leakage and improves overall security**. To prioritize minimal hardware resources and near zero latency, the FNV-1a simple hash algorithm was selected.
+
+If stronger cryptographic security is required, the same block structure can instead use algorithms such as `AES-256` or `ChaCha`.
+
+The operating mode follows the conventional **AES-CTR (Counter Mode)**, with the only change being that the block cipher is replaced by the `FNV-1a` hash engine.
+
+![AES CTR(Counter) operation](references/aes-ctrmode-ex.jpg)
+
+> **PQC Scramble Flowchart w/FNV-1a**
 
 ![PQC Scramble Flowchart](PQC_Scramble.svg)
 

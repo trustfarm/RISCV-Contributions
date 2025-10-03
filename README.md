@@ -26,7 +26,11 @@ This repository includes several documents and materials for RISC-V contribution
 # PQC Section
 
 ---
+## [PQC_ISA_Security_patch_spec proposal v0.12 (EN)](PQC/PQC_ISA_security_patch_spec_v0_12_EN.md)
+## [PQC_ISA_Security_patch_spec proposal v0.12 (KO)](PQC/PQC_ISA_security_patch_spec_v0_12_KR.md)
+
 ## [PQC_ISA_Security_patch_spec proposal draft_v0.1 (EN)](PQC/PQC_ISA_security_patch_spec_v0_1_EN.md)
+
 ## [PQC_ISA_Security_patch_spec proposal draft_v0.1 (KO)](PQC/PQC_ISA_security_patch_spec_v0_1_KO.md)
 
 ---

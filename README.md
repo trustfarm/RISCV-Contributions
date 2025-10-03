@@ -38,4 +38,9 @@ This repository includes several documents and materials for RISC-V contribution
     
   - [PQC_ISA_NTT_Development draft v0_3](PQC/Kyber_NTT_ISA_Integration_v0_3.md)
   
+---
+
+## TEE Draft Roadmap Section
+  - [Scrambler_TEE_Proposal_KO](TEE/Scrambler_TEE_E2E_Proposal_KO_refreshed.md)
+  - [Scrambler_TEE_Proposal_EN](TEE/Scrambler_TEE_E2E_Proposal_EN_refreshed.md)
 

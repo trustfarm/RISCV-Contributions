@@ -173,7 +173,7 @@ The Keccak‑f[1600] permutation operates on a 1600‑bit state for 24 rou
 | Partial Unroll | 4–6 rounds / cycle | Balanced |
 | Iterative | 1 round / cycle | Compact / slower |
 
-In RV‑PQC, Keccak is typically streamed as an XOF source feeding the NTT pipeline; its **unroll factor u** must match the NTT consumption rate.
+In RV‑PQC, Keccak is typically streamed as an XOF source feeding the NTT pipeline; its **unroll factor**  **$u$** must match the NTT consumption rate.
 
 **References:**  
 - https://keccak.team/keccak.html  
@@ -187,7 +187,7 @@ In RV‑PQC, Keccak is typically streamed as an XOF source feeding the NTT pipel
 
 - NTT processes one polynomial roughly every 128–256 clocks.  
 - Keccak must stream XOF output at a matching rate.  
-- Choose unroll factor $u$ to equalize dataflow.
+- Choose unroll factor  $u$   to equalize dataflow.
 
 ### Streaming Architecture
 
@@ -255,7 +255,7 @@ b(x) = a(x)\,s(x) + e(x) \pmod{q, f(x)}
 $$
 
 Each term is a polynomial; $e(x)$ follows a discrete Gaussian.  
-Multiplication occurs modulo  $f(x)$  and  $q$ .
+Multiplication occurs modulo  $f(x)$  and   $q$ .
 
 ### Advantages
 
@@ -268,7 +268,7 @@ Multiplication occurs modulo  $f(x)$  and  $q$ .
 
 | Type | Description | NIST PQC Mitigation |
 |------|--------------|--------------------|
-| **Ideal lattice structure** | extra symmetry → possible subring/automorphism attacks | Cyclotomic  $f(x)=x^n+1$  only |
+| **Ideal lattice structure** | extra symmetry → possible subring/automorphism attacks | Cyclotomic   only |
 | **Parameter sensitivity** | small  $n,q,σ$  reduce security | Verified Kyber/Dilithium params |
 | **Search vs Decisional gap** | hardness may differ | Module‑LWE extension used |
 | **Noise bias** | RNG bias → key leakage | CBD or SHAKE noise generation |
@@ -321,9 +321,9 @@ It uses a single **Unified Butterfly Unit (U‑BTF)** shared by both trans
 
 | Scenario | NTT Latency | XOF Bandwidth Need | Recommended $u$ (24 rounds) |
 |-----------|-------------|--------------------|-----------------------------|
-| Low‑area (P=1) | 1000 clocks | Low (few MB/s) | $u≈0.1$ (1 round/10 cycles) |
-| Balanced (P=8) | 256 clocks | Medium (100s MB/s) | $u≈0.3–0.5$ (1 round/2–3 cycles) |
-| High‑perf (P=16) | 128 clocks | > 1 GB/s | $u≈0.6–1.0$ (≈1 round/cycle) |
+| Low‑area (P=1) | 1000 clocks | Low (few MB/s) | $u ≈ 0.1$  (1 round/10 cycles) |
+| Balanced (P=8) | 256 clocks | Medium (100s MB/s) | $u ≈ 0.3–0.5$  (1 round/2–3 cycles) |
+| High‑perf (P=16) | 128 clocks | > 1 GB/s | $u ≈ 0.6–1.0$  (≈1 round/cycle) |
 
 ### Implications
 

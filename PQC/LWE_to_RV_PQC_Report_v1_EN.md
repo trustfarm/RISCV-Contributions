@@ -229,7 +229,7 @@ In RV‑PQC, Keccak is typically streamed as an XOF source feeding the NTT pipel
 
 The progression **LWE → RLWE → NTT → Keccak** forms the mathematical and architectural core of modern PQC hardware.  
 RV‑PQC platforms build on this chain, synchronizing NTT throughput with Keccak unrolling to achieve optimal performance.  
-For embedded FPGA‑class systems, $P=W=4–8$ is practical; for ASICs, $P=W=8–16$ is feasible.
+For embedded FPGA‑class systems,  $P = W = 4 ∼ 8$   is practical; for ASICs,  $P = W = 8 ∼ 16$   is feasible.
 
 ---
 
@@ -244,9 +244,9 @@ This foundational paper introduced **Ring‑LWE**, extending LWE into the polyno
 ### Key Contributions
 
 1. **Ideal Lattice Definition** — lattices with multiplicative structure.  
-2. **RLWE Problem Definition** — uses $R_q = \mathbb{Z}_q[x]/(f(x))$.  
+2. **RLWE Problem Definition** — uses $R_q = \mathbb{Z}_q[x]/f(x)$.  
 3. **Security Reduction** — RLWE ↔ worst‑case Ideal‑SIVP.  
-4. **Parameter Constraints** — $n$, $q$, and noise $\sigma$ requirements.
+4. **Parameter Constraints** —   $n$ ,  $q$ ,  and noise  $\sigma$   requirements.
 
 ### RLWE Equation
 
@@ -255,7 +255,7 @@ b(x) = a(x)\,s(x) + e(x) \pmod{q, f(x)}
 $$
 
 Each term is a polynomial; $e(x)$ follows a discrete Gaussian.  
-Multiplication occurs modulo $f(x)$ and $q$.
+Multiplication occurs modulo  $f(x)$  and  $q$ .
 
 ### Advantages
 
@@ -268,8 +268,8 @@ Multiplication occurs modulo $f(x)$ and $q$.
 
 | Type | Description | NIST PQC Mitigation |
 |------|--------------|--------------------|
-| **Ideal lattice structure** | extra symmetry → possible subring/automorphism attacks | Cyclotomic $f(x)=x^n+1$ only |
-| **Parameter sensitivity** | small $n,q,σ$ reduce security | Verified Kyber/Dilithium params |
+| **Ideal lattice structure** | extra symmetry → possible subring/automorphism attacks | Cyclotomic  $f(x)=x^n+1$  only |
+| **Parameter sensitivity** | small  $n,q,σ$  reduce security | Verified Kyber/Dilithium params |
 | **Search vs Decisional gap** | hardness may differ | Module‑LWE extension used |
 | **Noise bias** | RNG bias → key leakage | CBD or SHAKE noise generation |
 | **Side‑channel** | timing/power leakage | constant‑time NTT & mod ops |

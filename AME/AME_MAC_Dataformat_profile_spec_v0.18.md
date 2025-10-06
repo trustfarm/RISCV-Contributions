@@ -912,7 +912,7 @@ While ≥2R/1W ports are sufficient for base GEMM workloads, future SoC/LLM-clas
   - Modes: 2×2, 1×4, 4×1, Guarded 4×4.  
   - Example: For FP32, a tile is 16×4. In Guarded 4×4 mode (≤16b outputs only), the hardware treats sub-blocks as 4×4 MMACC groups.  
 - **Important**: Diagrams showing 4×4 are **sub-tile mappings**, not the tile size itself.
-
+- Also, This TRF is configured Logically Unified (ACC , A, B) Operationsfor small footprint SoC
 ---
 
 ## Appendix D: Nvidia TF32 , internal FP22 and Analysis of NVFP4

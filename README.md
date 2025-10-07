@@ -42,7 +42,7 @@ This repository includes several documents and materials for RISC-V contribution
 ---
 ## PQC Study Kyber/Dilithium ASIC/FPGA Design very useful References section 
    
-  - [ (KO)](PQC/LWPQC_Kyber_Dilithium_ASIC_FPGA_Design_References.md)
+  - [PQC_Kyber_Dilithium_ASIC_FPGA_Design_References (KO)](PQC/LWPQC_Kyber_Dilithium_ASIC_FPGA_Design_References.md)
 
 ---
 ## PQC Draft NTT section 

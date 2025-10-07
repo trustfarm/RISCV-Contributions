@@ -13,6 +13,9 @@ This repository includes several documents and materials for RISC-V contribution
 
 # AME Section
 ---
+  - [AME MAC Dataformat profile proposal v0.18d](AME/AME_MAC_Dataformat_profile_spec_v0.18d.md)
+    - [**Supplimentary TileOperation details (internal-unified/separated,external-DDR,HBM separated)**](AME/AME_Tile_Exec_Notes_v0.18d.md)
+  
   - [AME MAC Dataformat profile proposal v0.18](AME/AME_MAC_Dataformat_profile_spec_v0.18.md)
   - [AME MAC Dataformat profile proposal v0.17c](AME/AME_MAC_Dataformat_profile_spec_v0.17c.md)
   - [AME MAC Dataformat profile proposal v0.17b](AME/AME_MAC_Dataformat_profile_spec_v0.17b.md)
@@ -35,6 +38,11 @@ This repository includes several documents and materials for RISC-V contribution
    
   - [LWE_to_RV_PQC_Report_v1 (EN)](PQC/LWE_to_RV_PQC_Report_v1_EN.md)
   - [LWE_to_RV_PQC_Report_v1 (KO)](PQC/LWE_to_RV_PQC_Report_v1_KR.md)
+
+---
+## PQC Study Kyber/Dilithium ASIC/FPGA Design very useful References section 
+   
+  - [ (KO)](PQC/LWPQC_Kyber_Dilithium_ASIC_FPGA_Design_References.md)
 
 ---
 ## PQC Draft NTT section 

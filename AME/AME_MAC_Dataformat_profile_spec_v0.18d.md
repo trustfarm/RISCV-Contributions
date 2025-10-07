@@ -36,8 +36,20 @@ C = MMACC(A, B, K, M, bTR, RFmt, IFmt, bTOP)
 - `IFmt` : **Input Format (8-bit)** — selects operand data type (formerly `Ft`)
 - `bTOP` : **Tile Operation Mode** — selects Unified Tile Operation : 0b, External Accumulator Tile : 1b
 
-> **Note:** Moving from `bOVF`(1-bit) to `RFmt`(8-bit) exposes explicit control over the **accumulate/output** precision (e.g., INT8/INT16/BF16/FP32), improving portability and compiler scheduling.
+> **Note1:** Moving from `bOVF`(1-bit) to `RFmt`(8-bit) exposes explicit control over the **accumulate/output** precision (e.g., INT8/INT16/BF16/FP32), improving portability and compiler scheduling.
   You can configure many Input formats to map Result formats , by design of customized MUL kernel
+
+> **Note2:** 
+>   ## `bTOP` Operation Supplements Documents -- **see here** 
+>   - [AME_Tile_Exec_Notes_v0.18d.md](AME_Tile_Exec_Notes_v0.18d.md) 
+>   
+>   > `bTOP = 0` : Internal Mode
+>   1. **logically unified** In compact SoCs, the TRF (Tile Register File) can be share (A,B,C share same space), or
+> 
+>   2. **split - separated** (A,B in TRF, C in A‑RF). Both fall under internal `bTOP=0` mode.
+>   > `bTOP = 1` : External Mode
+>   1. **separated external** In HPC/TPU SoCs, the TRF (Tile Register File) and A,B,C is feed in/out on external memory with DMA/MMIO
+>
 
 ---
 

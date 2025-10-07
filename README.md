@@ -55,3 +55,5 @@ This repository includes several documents and materials for RISC-V contribution
   - [Scrambler_TEE_Proposal_KO](TEE/Scrambler_TEE_E2E_Proposal_KO_refreshed.md)
   - [Scrambler_TEE_Proposal_EN](TEE/Scrambler_TEE_E2E_Proposal_EN_refreshed.md)
 
+  - [RISC-V Memory Encryption Proposal (Draft v0.1) (KO)](TEE/RISCV_Memory_Encryption_uArch_(draft)_KO_V_0_1.md)
+  - [RISC-V Memory Encryption Proposal (Draft v0.1) (EN)](TEE/RISCV_Memory_Encryption_uArch_(draft)_EN_V_0_1.md)

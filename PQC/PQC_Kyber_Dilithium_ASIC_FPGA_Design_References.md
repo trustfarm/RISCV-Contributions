@@ -50,6 +50,7 @@
 - Keccak 다중 코어로 샘플링 숨기기, 스케줄링 최적화 예시 풍부.  
 - FALCON verify 비교까지 포함, 설계 trade-off 파악에 유용.  
 - 대표도면 위치: NTT butterfly/아키텍처(페이지 10–12), 서명 스케줄(12–13), 결과/자원(24).  
+  - https://github.com/GMUCERG/Dilithium 
 **링크:** https://csrc.nist.gov/csrc/media/Events/2022/fourth-pqc-standardization-conference/documents/papers/high-performance-hardware-implementations-pqc2022.pdf
 
 ---
@@ -60,7 +61,8 @@
 - 모듈화된 다항연산/해시 블록 설계 및 자원-성능 트레이드오프.  
 - 이후 다수 연구의 비교 기준점(베이스라인) 역할.  
 - (ACM 유료, 초록/메타데이터 공개)  
-**링크:** https://dl.acm.org/doi/10.1145/3465481.3465756
+**링크:** https://iacr.steepath.eu/2021/108-ImplementingCRYSTALSDilithiumSignatureSchemeonFPGAs.pdf ,
+        https://dl.acm.org/doi/10.1145/3465481.3465756
 
 ---
 
@@ -70,7 +72,7 @@
 - ML-KEM/ML-DSA로의 이행 시 성능 추세 보존 가능성 논의.  
 - 자원-성능 비교 및 에너지/스루풋 평가 포함.  
 - 실제 서비스형 시나리오에서의 최적 배치 크기 추정도 제시.  
-**링크:** (학술DB/출판사 링크 참조)
+**링크:** https://core.ac.uk/download/pdf/638747765.pdf
 
 ---
 

@@ -83,7 +83,7 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography
 >
 > 더 작은/큰 Q로 가도 분포 정확도 이득은 거의 없으니, sampler 선택(CDT/ExpCut/Ziggurat 등) 과 σ 세팅이 품질을 좌우.
 
-[Falcon Validate Python code](#falcon-validate-python-code)
+[Falcon Validate Python code](#8-falcon-qxy-simulation-and-analysis)
 
 ---
 

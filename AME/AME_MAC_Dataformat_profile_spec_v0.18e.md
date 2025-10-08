@@ -177,12 +177,11 @@ Notes:
 |         | 0x4B–0x4F    | RESERVED       | 32-bit Reserved                   |
 |   -     |    -         |   -            |   -                               |
 | 64bits  | 0x80         | **INT64**      | 64-bit signed integer             |
-|         | 0x84         | **Q12.52**     | fixed-FP I12.M52 (PQC Falcon cd1) |
-|         | 0x85         | **Q16.48**     | fixed-FP I16.M48 (PQC Falcon cd2) |
-|         | 0x86         | **Q18.46**     | fixed-FP I18.M46 (PQC Falcon cd3) |
+|         | 0x82         | **Q12.52**     | fixed-FP I12.M52 (PQC Falcon cd1) |
+|         | 0x83         | **Q16.48**     | fixed-FP I16.M48 (PQC Falcon cd2) |
+|         | 0x84         | **Q18.46**     | fixed-FP I18.M46 (PQC Falcon cd3) |
 |         | 0x85         | **Q20.44**     | fixed-FP I20.M44 (PQC Falcon cd4) |
-|         | 0x85         | **Q22.42**     | fixed-FP I22.M42 (PQC Falcon cd5) |
-|         | 0x8A         | **Q32.32**     | fixed-point sINT32+32MANT         |
+|         | 0x86         | **Q22.42**     | fixed-FP I22.M42 (PQC Falcon cd5) |
 |         | 0x88         | **FP64**       | **IEEE double precision (sE11M52)**  |
 |         | 0x8A         | **Q32.32**     | fixed-point sINT32+32MANT         |
 |         | 0x8B–0x8F    | RESERVED       | 64-bit Reservered                 |

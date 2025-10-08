@@ -59,9 +59,31 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography
 - 고려: 정확도‑성능‑메모리 트레이드오프, 스케일 스케줄 표준화.
 
 ### C. **Q‑fixed(예: AME Q32.32) 기반 구현**
-- AME 스펙의 `Q32.32 (signed 64b, 32정수+32소수)`로 **복소 FFT/샘플러를 고정소수점화** 방식을 채용 `Qx.y` 에서 Q.x 를 어느 수준으로 할지는 Falcon 주요연산 부분을 simulation 해야 함.
+- RISCV AME 스펙의 `Q32.32 (signed 64b, 32정수+32소수)`로 **복소 FFT/샘플러를 고정소수점화** 방식을 채용 `Qx.y` 에서 Q.x 를 어느 수준으로 할지는 Falcon 주요연산 부분을 simulation 해야 함. 
+> [RISCV AME 스펙 Proposal-DataFormat 바로가기](../../AME/AME_MAC_Dataformat_profile_spec_v0.18e.md#4-formattype-fmt-codes-8-bit)
+
 - 산술 규칙(핵심): `64×64→128b 곱셈값` 확보 후 **>> 32**(라운딩) 정규화, 포화 가산/감산, 스테이지별 스케일(>>1), 라운딩 정책 고정.
 - 트위들 ROM은 대규모가 되지 않도록 **TWGEN(quarter‑wave LUT, per‑stage base×pow, CORDIC/DDS, 폴리근사)** 로 대체/경량화.
+
+---
+### 3-1) 적정 Qx.y  - OCT 8,2025
+  - **Q18.46** - 이 Gaussian 우선 관점에서 현재 최적 Approach 임.
+>
+> 분포 정확도: Q16~Q22 구간에서는 동일 수준 (MSE, KS 차이 없음).
+> 
+>  - 정밀도 영향은 사실상 **sampler/σ**가 결정, 
+>  - `Q` 비트폭은 포화 영역.
+>
+>  - 속도/자원: `Q18.46 ~ Q20.44` 구간이 가장 효율적.
+>  - 그중 평균 속도는 Q18.46가 최적(≈8.5 μs/sample).
+>  - `Q21~Q22`는 분포 이득 없이 비용만 증가.
+
+- **추천**
+> Gaussian 품질(정확도)을 최우선으로 봤을 때 Q18.46이 정확도 손실 없이 가장 빠른 균형점.
+>
+> 더 작은/큰 Q로 가도 분포 정확도 이득은 거의 없으니, sampler 선택(CDT/ExpCut/Ziggurat 등) 과 σ 세팅이 품질을 좌우.
+
+[Falcon Validate Python code](#falcon-validate-python-code)
 
 ---
 
@@ -114,6 +136,22 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography
 - **공통 규칙**: `64×64→128b` 곱셈값, **>> 32 라운딩**, 포화 가산/감산, 스테이지별 >>1 스케일, 라운딩/스케일 정책 고정.
 
 ---
+
+## 8) Falcon Qx.y Simulation and Analysis
+
+`./falcon_validate/` 디렉토리에 python code 가 있음.
+ - 사용예제
+```bash
+python -m falcon_validate.main --sweep  --I_list 16,17,18,19,20,21,22  --N_list 256,512,1024,2048  --sigma_list 1.4  --mp_dps_list 40 --sampler_list cdt,knuth_yao,rejection,ziggurat,alias,expcut
+```
+```
+  * --sweep  : 입력 파라이미터들을 순차적으로 조합해서 sweep 수행한다.
+  * --I_list 16,18  : Q16.48,Q18.46 의 FixedPoint FP 를 조합한다.
+  * --N_list        : N의 크기값을 지정한다.
+  * --sigma_list 1.2,1.4  : sigma 범위 (1.0 ~ 2.0) 사이값을 지정한다.
+  * --mp_dps_list 33 : FP128 비트의 레퍼런스 값을 랜덤생성하여 값을 계산할때 사용한다. (40 : FP256 비트크기)
+  * --sampler_list : FFT 는 기본 포함되어있고, Gaussian 분포를 생성하는 알려진 알고리즘들 (cdt,knuth_yao,rejection,ziggurat,alias,expcut) 등에 대해서 연산테스트를 수행한다.
+```
 
 ### 출처(요약)
 - NIST CSRC PQC: https://csrc.nist.gov/Projects/post-quantum-cryptography  

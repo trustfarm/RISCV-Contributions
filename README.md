@@ -13,7 +13,7 @@ This repository includes several documents and materials for RISC-V contribution
 
 # AME Section
 ---
-  - [AME MAC Dataformat profile proposal v0.18d](AME/AME_MAC_Dataformat_profile_spec_v0.18e.md)
+  - [AME MAC Dataformat profile proposal v0.18f](AME/AME_MAC_Dataformat_profile_spec_v0.18f.md)
     - [**Supplimentary TileOperation details (internal-unified/separated,external-DDR,HBM separated)**](AME/AME_Tile_Exec_Notes_v0.18d.md)
   
   - [AME MAC Dataformat profile proposal v0.18](AME/AME_MAC_Dataformat_profile_spec_v0.18.md)

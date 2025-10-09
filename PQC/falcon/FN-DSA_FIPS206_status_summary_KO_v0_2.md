@@ -147,7 +147,7 @@ python -m falcon_validate.main --sweep  --I_list 16,17,18,19,20,21,22  --N_list 
 ```
   * --sweep  : 입력 파라이미터들을 순차적으로 조합해서 sweep 수행한다.
   * --I_list 16,18  : Q16.48,Q18.46 의 FixedPoint FP 를 조합한다.
-  * --N_list        : N의 크기값을 지정한다.
+  * --N_list        : FFT N의 크기값을 지정한다.
   * --sigma_list 1.2,1.4  : sigma 범위 (1.0 ~ 2.0) 사이값을 지정한다.
   * --mp_dps_list 33 : FP128 비트의 레퍼런스 값을 랜덤생성하여 값을 계산할때 사용한다. (40 : FP256 비트크기)
   * --sampler_list : FFT 는 기본 포함되어있고, Gaussian 분포를 생성하는 알려진 알고리즘들 (cdt,knuth_yao,rejection,ziggurat,alias,expcut) 등에 대해서 연산테스트를 수행한다.

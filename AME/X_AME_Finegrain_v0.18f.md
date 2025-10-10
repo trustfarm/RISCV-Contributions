@@ -37,7 +37,8 @@ Instead of embedding scale logic into MAC tiles, SA/SW are fed via sideband pipe
 CSR/DMA ──> │ │ SW_next │─>│ SW_prefetch │─peek   ─> │ SW_current │──────┼──┼──┐ 
             │ └─────────┘  └─────────────┘           └────────────┘      │  │  │
             │       ▲ commit          km progress, trigger     ▲         │  │  │
-            │       │                      feedback ───────────┘         │  │  │ └───────┼────────────────────────────────────────────────────┘  │  │ 
+            │       │                      feedback ───────────┘         │  │  │ 
+            └───────┼────────────────────────────────────────────────────┘  │  │ 
                     │                                                       │  │ 
                     ▼                                                       │  │ 
 A Tile (FP8) ────────────────┐<─────────────────────────────────────────────┘  │

@@ -1,0 +1,106 @@
+// ============================================================
+//  X-AME Fine-Grain Scaling Pipeline (with Partial Peek & Double Buffering)
+//  Version: v0.18f
+//  Purpose: Illustrates SA/SW double-buffered scale path and MAC pipeline
+//  Notes:
+//    - Scale Path runs in sideband, hides latency via peek/commit cycle
+//    - Maintains 1 Tile / 1 Clock throughput
+//    - Feedback triggers commit and next prefetch
+//    - Compatible with bTOP=0 (internal RF) / bTOP=1 (external DMA)
+// ============================================================
+
+digraph X_AME_FG_Scaling {
+  rankdir=TB;
+  compound=true;
+  fontsize=12;
+  labelloc="t";
+  label="X-AME Fine-Grain Scaling Pipeline (with Partial Peek & Double Buffering)";
+  node [shape=box, fontsize=11, style="rounded,filled", fillcolor="#F9FAFB"];
+
+  // -----------------------------
+  //  Scale Sideband Path (SA/SW)
+  // -----------------------------
+  subgraph cluster_scale {
+    label="Scale Path (Sideband)\n*peek/commit hides latency; 1 Tile / 1 Clock maintained*";
+    color="#CBD5E1";
+    style="rounded";
+
+    // Double buffering for Activator and Weight scaling
+    SA_next [label="SA_next", fillcolor="#E0F2FE"];
+    SW_next [label="SW_next", fillcolor="#E0F2FE"];
+
+    SA_pref [label="SA_prefetch / peek (1×128)", shape=box, fillcolor="#DBEAFE"];
+    SW_pref [label="SW_prefetch / peek (1×128)", shape=box, fillcolor="#DBEAFE"];
+
+    SA_cur [label="SA_current", fillcolor="#E0F2FE"];
+    SW_cur [label="SW_current", fillcolor="#E0F2FE"];
+
+    commit [label="commit (next→current)\n[atomic swap: SA/SW]", shape=box, fillcolor="#DDD6FE"];
+
+    // Path connections
+    SA_next -> SA_pref -> SA_cur;
+    SW_next -> SW_pref -> SW_cur;
+
+    // Commit dashed links (feedback trigger)
+    SA_pref -> commit [style=dashed, color="#94A3B8", label="km_progress"];
+    SW_pref -> commit [style=dashed, color="#94A3B8"];
+  }
+
+  // -----------------------------
+  //  Input Tiles
+  // -----------------------------
+  A_tile [label="A Tile (FP8) 256B\n16×16", fillcolor="#FEF3C7"];
+  B_tile [label="B Tile (FP8) 256B\n16×16", fillcolor="#FEF3C7"];
+
+  // -----------------------------
+  //  Dequantization + Scale
+  // -----------------------------
+  deqA [label="Dequant + × SA_current\n(FP8→FP16/BF16 + Scaled Activator)", fillcolor="#DCFCE7"];
+  deqB [label="Dequant + × SW_current\n(FP8→FP16/BF16 + Scaled Weight)", fillcolor="#DCFCE7"];
+
+  // -----------------------------
+  //  Multiply-Accumulate Core
+  // -----------------------------
+  subgraph cluster_mac {
+    label="Dequant + Multiply-Accumulate Pipeline";
+    color="#CBD5E1";
+    style="rounded";
+    MAC [label="MMACC Core\n(1 Tile / 1 Clock)\nA×B → C(FP32)", fillcolor="#F1F5F9"];
+  }
+
+  // -----------------------------
+  //  Accumulator and Outputs
+  // -----------------------------
+  ACC [label="Accumulator C (FP32)\n• Internal A-RF (bTOP=0)\n• External DMA path (bTOP=1)", fillcolor="#FFE4E6"];
+  Astore [label="Astore → External Memory (bTOP=1)", fillcolor="#FCE7F3"];
+  IntARF [label="Internal A-RF (bTOP=0)\nLocal Tile Bank\n(1-cycle overlap w/ next tile)", fillcolor="#FCE7F3"];
+
+  // -----------------------------
+  //  Interconnections
+  // -----------------------------
+  // A-path
+  A_tile -> deqA -> MAC;
+  // B-path
+  B_tile -> deqB -> MAC;
+
+  // Scale sideband to Dequant
+  SA_cur -> deqA [color="#22C55E", label="scale feed"];
+  SW_cur -> deqB [color="#22C55E", label="scale feed"];
+
+  // MAC output to ACC
+  MAC -> ACC;
+
+  // ACC fanout
+  ACC -> Astore;
+  ACC -> IntARF;
+
+  // -----------------------------
+  //  Feedback / CSR
+  // -----------------------------
+  status [label="CSR.status / km_progress\n(tile_count, commit trigger, ext_tile_sel)", shape=box, fillcolor="#FFFFFF"];
+  MAC -> status [style=dashed, color="#94A3B8", label="progress update"];
+  status -> SA_pref [style=dashed, color="#94A3B8"];
+  status -> SW_pref [style=dashed, color="#94A3B8"];
+
+  // Note: External mode uses CSR.ext_tile_count[N] and CSR.ext_tile_sel for tile indexing.
+}

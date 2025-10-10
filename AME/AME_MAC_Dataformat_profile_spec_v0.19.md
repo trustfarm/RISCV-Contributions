@@ -66,6 +66,93 @@ B(tile) ┘                               │
                                                                         (DeepGemm Features)
 ```
 
+**Extend Tile Operation Archtecture**
+
+## Base AME - for Scaled Activator / Scaled Weight
+
+```
+A Tile (FP8) ───┐
+                ├──► × SA (Scaled Activator)
+                │
+B Tile (FP8) ───┤
+                ├──► × SW (Scaled Weight)
+                │
+                ▼
+     [ Dequant + Multiply-Accumulate Pipeline ]
+                │
+                ▼
+          Accumulator (C, FP32)
+                │
+                ├─► Astore → External Memory (bTOP=1)
+                └─► Internal A-RF (bTOP=0)
+
+```
+
+## VNS(VeNdorSpecific) Extended X-AME Fine-Grain Scaling Pipeline
+
+
+```
+            ┌────────────────────────────────────────────────────────────┐
+            │                    SCALE PATH (Sideband)                   │
+            │ *peek/commit hides latency; 1 Tile / 1 Clock maintained.*  │
+            │ ┌─────────┐  ┌─────────────┐           ┌────────────┐      │
+            │ │ SA_next │─>│ SA_prefetch │─partial─> │ SA_current │──────┼──┐
+CSR/DMA ──> │ │ SW_next │─>│ SW_prefetch │─peek   ─> │ SW_current │──────┼──┼──┐ 
+            │ └─────────┘  └─────────────┘           └────────────┘      │  │  │
+            │       ▲ commit          km progress, trigger     ▲         │  │  │
+            │       │                      feedback ───────────┘         │  │  │
+            └───────┼────────────────────────────────────────────────────┘  │  │ 
+                    │                                                       │  │ 
+                    ▼                                                       │  │ 
+A Tile (FP8) ────────────────┐<─────────────────────────────────────────────┘  │
+                             │                                                 │
+                             ├───────> (FP8→FP16 Dequant)                      │ 
+                             │       × SA_current(Scaled Activator)            │
+                             │                                                 │
+                             │                                                 │
+                             │<────────────────────────────────────────────────┘
+B Tile (FP8) ────────────────┤                                                          
+                             ├───────> (FP8→FP16 Dequant)                
+                             │         × SW_current (Scaled Weight) 
+                             │                                                     
+                             ▼
+            ┌──────────────────────────────────────────────────────┐
+            │   [ Dequant + Multiply-Accumulate Pipeline ]         │
+            │   – A×B using current SA/SW scales                   │
+            │   – 1 Tile / 1 Clock throughput maintained           │
+            │   – Feedback: update km_progress, peek_next scales   │
+            └──────────────────────────────────────────────────────┘
+                             │
+                             ▼
+            ┌──────────────────────────────┐
+            │  Accumulator (C, FP32)       │
+            │  • Internal A-RF (bTOP=0)    │
+            │  • External DMA path (bTOP=1)│
+            └──────────────────────────────┘
+                             │
+                             ├─► Astore (bTOP=1) → External Memory 
+                             │    
+                             └─► Internal Acc (bTOP=0)
+                                 Local A-RF Tile Bank 
+
+```
+
+**Graphical Flow diagram**
+
+![X-AME FineGrain](AME_FG_Scaling.svg)
+
+## X-AME Supports FineGrained Features
+
+| Stage                     | Features                                      | Notes                           |
+| ------------------------- | --------------------------------------- | ---------------------------- |
+| **Scale Prefetch & Peek** | Get Prefetch SA/SW `next` set , and tile in the same time| latency hide with Double-buffer architecture |
+| **Commit / Feedback**     | current `tile` finished , `next→current` signal commit         | CSR or FSM auto feedback to sideband           |
+| **Dequant + Scale**       | FP8 → FP16 Dequant state, apply SA/SW multiplication | parallel with tile path, no pipeline stall for 1tile/1clock |
+| **MMACC Core**            | A×B Acc (FP16→FP32)                      | for AME 1Tile/1Clk |
+| **Accumulator Output**    | Internal A-RF(bTOP=0) or External DMA(bTOP=1) | compatible with unified ISA  |
+
+**More Details**  - [X_AME_Finegrain_v0.18f.md](X_AME_Finegrain_v0.18f.md)
+
 ---
 
 ## 2. Legend

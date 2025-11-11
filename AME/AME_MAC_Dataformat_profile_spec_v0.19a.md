@@ -1,4 +1,4 @@
-# AME MMACC Dataformat and MMACC workloads profile v0.18d — Proposals
+# AME MMACC Dataformat and MMACC workloads profile v0.19a — Proposals
 
 > - Author : KyuTae Ahn (trustfarm.info@gmail.com , cpplover@trustfarm.net) 
 > - Licenses : 

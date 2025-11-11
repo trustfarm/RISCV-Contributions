@@ -1,0 +1,38 @@
+digraph FP8xFP8_to_FP16_TILE {
+  rankdir=auto; nodesep=0.8; ranksep=0.9;
+  fontname="Helvetica";
+  node [shape=box, style="rounded,filled", fillcolor=white, fontsize=11, fontname="Helvetica"];
+  edge [fontsize=10, fontname="Helvetica"];
+
+  { rank=source;
+    LEG [shape=note, fontsize=10,
+      label="1-tile-per-clock streaming (II=1)\nA: FP8 tile, B: FP8 tile → MAC: FP8×FP8→FP16-FMA (complex)\nC: FP16 tile; K-chunk partial sums with SCALE_SHIFT if needed\nDual-port tile SRAM (A/B reads, C write)"];
+  }
+
+  // Tile memories
+  A [label="A tile SRAM\nFP8 (Dual-port R)"];
+  B [label="B tile SRAM\nFP8 (Dual-port R)"];
+  C [label="C tile SRAM\nFP16 (W)\naccumulate per K-chunk", fillcolor="#E8F3FF"];
+
+  // Hidden alignment
+  LEG -> A [style=invis, weight=5];
+  A -> B [style=invis, weight=5];
+
+  // Microkernel block
+  MK [label="MK: FP8×FP8 → FP16 FMA\n• per-lane light decode (inside)\n• complex MAC (4M+2A or 3M+5A)\n• pipeline depth=3–5, II=1", fillcolor=lightgray];
+
+  SCALE [label="Optional SCALE_SHIFT / K-chunk reduce\n(block-float if needed)"];
+  WB [label="Write-back FP16 tile\n(POST: optional CAST_OUT)"];
+
+  // Dataflow
+  A -> MK;
+  B -> MK;
+  MK -> SCALE;
+  SCALE -> C;
+  C -> WB [style=dashed, label="store"];
+
+  // Parallel lanes note
+  LANES [shape=note, fontsize=9,
+    label="L parallel lanes to sustain II=1:\nThroughput ≈ L × (FMA/clk)\nChoose L for 256B/clk tile stream"];
+  MK -> LANES [style=invis];
+}

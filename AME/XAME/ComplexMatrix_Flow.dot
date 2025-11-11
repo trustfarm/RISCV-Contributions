@@ -1,0 +1,53 @@
+digraph ComplexMatrix_Flow {
+  rankdir=TB;
+  nodesep=0.8; ranksep=0.9;
+  fontname="Helvetica";
+  node [shape=box, style="rounded,filled", fillcolor=white, fontsize=11, fontname="Helvetica"];
+  edge [fontsize=10, fontname="Helvetica"];
+
+  // --- Legend at top ---
+  { rank=source;
+    LEG [shape=note, fontsize=10,
+      label="Angle Estimation Branches:\n• FFT Beamforming (fast, lower resolution)\n• Super-Resolution (MUSIC/ESPRIT) via Covariance + EVD (higher precision)\nCommon pre-processing: Range/Doppler FFT\nAll kernels map to GEMV/GEMM; small dense EVD/SVD favored by X-AME complex ops"];
+  }
+
+  // --- Common input & pre-processing ---
+  RAW  [label="ADC / Chirp Data\n(4D Radar or MIMO Streams)\nComplex FP16"];
+  RDFF [label="Range/Doppler FFT\nTile-based MMACC\n(FP16→FP32)"];
+
+  // keep layout tidy
+  LEG -> RAW [style=invis, weight=5];
+
+  // --- Branch 1: FFT Angle Beamforming ---
+  ANGFFT [label="Angle FFT Beamforming\n(FFT along array dim)\nGEMV-like pipeline"];
+  RADAR1 [label="Angle/Doppler Output\n(Real-time, ≤ ms)\nResolution: FFT-limited", fillcolor="#E8F3FF"];
+
+  // --- Branch 2: Super-Resolution (MUSIC/ESPRIT) ---
+  CUBE   [label="Array Snapshot X\n(Per-range/Doppler bin)\nComplex vectors"];
+  COV    [label="Covariance R = X·Xᴴ\n(16×16 or 32×32)\nComplex GEMM"];
+  EVD    [label="EVD / SVD\nSubspace Split\nSmall Dense Kernels"];
+  SPEC   [label="Spatial Spectrum\nMUSIC / ESPRIT\nGEMV / Projection"];
+  RADAR2 [label="Angle/Doppler Output\n(High precision)\nResolution: Super-res.", fillcolor="#E8F3FF"];
+
+  // --- Optional communication branch (re-uses matrix ops) ---
+  CHAN   [label="5G/6G Channel H\n(Nr×Nt up to 256×256)"];
+  PRECOD [label="Precoding / CE\nGEMM + SVD (MMSE/ZF)\nTile/BLIS/Accel", fillcolor="#F9F9CC"];
+
+  // --- Flow ---
+  RAW  -> RDFF;
+
+  // Branch to FFT beamforming
+  RDFF -> ANGFFT -> RADAR1;
+
+  // Branch to super-resolution
+  RDFF -> CUBE -> COV -> EVD -> SPEC -> RADAR2;
+
+  // Comms branch (separate source or shared front-end)
+  RAW -> CHAN [style=dashed, label="comm path"];
+  CHAN -> PRECOD;
+
+  // --- Notes on kernels ---
+  note1 [shape=note, fontsize=9,
+    label="Kernel map:\n• FFT: small GEMV (2×2 / 4×4 butterflies)\n• COV: GEMM (X·Xᴴ)\n• EVD/SVD: small dense ops\n• MUSIC proj.: GEMV a^H E_n E_n^H a\nData types: IFmt=FP16, OFmt=FP32"];
+  SPEC -> note1 [style=invis]; // for layout stability
+}

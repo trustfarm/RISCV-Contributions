@@ -1,0 +1,12 @@
+digraph XAME_VNS {
+    rankdir=TB; nodesep=1.0;
+    node [shape=box, style=rounded, fontsize=11];
+    A [label="Tile A (Input)"];
+    B [label="Tile B (Input)"];
+    MAC [label="MMACC Core (K,M,bTR,bTOP)"];
+    PLAN [label="VNS Plan CSR"];
+    SCALE [label="Finegrain SA/SW scale.peek/commit"];
+    PQC [label="NTT/FFT Shared Kernel"];
+    A -> MAC; B -> MAC; PLAN -> MAC;
+    MAC -> SCALE -> OUT; MAC -> PQC [style=dashed];
+}

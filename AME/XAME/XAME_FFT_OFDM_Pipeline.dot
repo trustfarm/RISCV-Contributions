@@ -1,0 +1,32 @@
+digraph XAME_FFT_OFDM_Pipeline {
+  rankdir=TB;
+  nodesep=1.0;
+  ranksep=0.8;
+  node [shape=record, style=filled, fillcolor=lightgray, fontsize=11];
+
+  legend_notes [shape=note, label="X-AME FFT/OFDM Execution Flow\nEach stage = pipeline of GEMV kernels inside 256B tile\nBFLY: Matrix-Vector\nTW: Element-wise multiply\nSHF: Reorder / stride / bitrev\nAll orchestrated by XMODE.OPS"];
+  legend_notes2 [shape=note, label="additional comments \n"];
+  
+  legend_notes -> legend_notes2 -> A,B [style=invis];
+
+  A [label="Input Tile A | FP16 (Re/Im)", fillcolor=white];
+  B [label="Twiddle Factors | FP16/FP32", fillcolor=white];
+  subgraph cluster0 {
+    label="Stage Kernel (Butterfly r=2/4)";
+    style=dashed;
+    color=gray;
+    BFLY [label="\{Small GEMV | 2x2 or 4x4 Complex MAC\}\nOPS: ksel=BFLY_R2/R4, radix=2/4"];
+  }
+  TW [label="Complex Multiply | OPS: TWIDMUL / CMUL_CONJ", fillcolor=white];
+  SHF [label="Shuffle / BitReverse / Transpose\nOPS: flags=BITREV / TRANSPOSE / stride_tpl", fillcolor=white];
+  OUT [label="Output C | FP32 (Re/Im pair)\nPOST: ABS / ABS2 / CAST_OUT", fillcolor=white];
+
+  legend_notes -> A,B [style=invis];
+
+  A -> BFLY;
+  B -> BFLY;
+  BFLY -> TW;
+  TW -> SHF;
+  SHF -> OUT;
+
+}

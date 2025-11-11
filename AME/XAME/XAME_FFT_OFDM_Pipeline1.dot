@@ -1,0 +1,43 @@
+digraph XAME_FFT_OFDM_Pipeline {
+  rankdir=TB;
+  nodesep=0.9;
+  ranksep=0.8;
+  fontname="Helvetica";
+  node [shape=box, style="rounded,filled", fillcolor=white, fontsize=11, fontname="Helvetica"];
+  edge [fontname="Helvetica"];
+
+  // --- Legend at top ---
+  { rank=source;
+    legend [shape=note, fontsize=11, label="X-AME FFT/OFDM Execution Flow\nEach stage = pipeline of GEMV kernels inside a 256B tile\nBFLY: Matrix–Vector (2x2 / 4x4)\nTW: Element-wise complex multiply\nSHF: Reorder / stride / bitrev\nAll orchestrated by XMODE.OPS"];
+  }
+
+  // --- Inputs on same rank ---
+  { rank=same;
+    A [label="Input Tile A\nFP16 (Re/Im)"];
+    B [label="Twiddle Factors\nFP16 / FP32"];
+  }
+
+  // Hidden edges to keep alignment and layout stable
+  legend -> A [style=invis, weight=5];
+  legend -> B [style=invis, weight=5];
+  A -> B [style=invis, weight=10];
+
+  // --- Stage kernel cluster ---
+  subgraph cluster_bfly {
+    label="Stage Kernel (Butterfly r=2/4)";
+    style=dashed;
+    color=gray;
+    BFLY [label="Small GEMV\n2x2 or 4x4 Complex MAC\nOPS: ksel=BFLY_R2/R4, radix=2/4"];
+  }
+
+  TW  [label="Complex Multiply\nOPS: TWIDMUL / CMUL_CONJ"];
+  SHF [label="Shuffle / BitReverse / Transpose\nOPS: flags=BITREV / TRANSPOSE / stride_tpl"];
+  OUT [label="Output C\nFP32 (Re/Im pair)\nPOST: ABS / ABS2 / CAST_OUT"];
+
+  // --- Dataflow ---
+  A  -> BFLY;
+  B  -> BFLY [label="twiddle feed", fontsize=9];
+  BFLY -> TW;
+  TW -> SHF;
+  SHF -> OUT;
+}

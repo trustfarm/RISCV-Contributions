@@ -1,0 +1,40 @@
+digraph LargeGEMM_Tiling {
+  rankdir=auto;
+  nodesep=0.9; ranksep=0.8;
+  fontname="Helvetica";
+  node [shape=box, style="rounded,filled", fillcolor=white, fontsize=11, fontname="Helvetica"];
+  edge [fontsize=10, fontname="Helvetica"];
+
+  // --- Legend ---
+  LEG [shape=note, fontsize=10, label="4096×4096 GEMM Decomposition\n- Tiled into 16×16 grid of 256×256 blocks\n- Each tile processed by microkernel (e.g., 16×16 MAC array)\n- Accumulate results across K dimension\nParallelism: 256 tiles concurrently, streaming pipeline"];
+
+  // --- Top-level blocks ---
+  A [label="Matrix A (4096×4096)\nPartitioned: 16 rows × 16 cols of 256×256 blocks", fillcolor="#F8F8F8"];
+  B [label="Matrix B (4096×4096)\nPartitioned: 16 rows × 16 cols of 256×256 blocks", fillcolor="#F8F8F8"];
+  C [label="Matrix C = A×B\n(4096×4096 Accumulated Result)", fillcolor="#E8F3FF"];
+
+  LEG -> A [style=invis];
+
+  subgraph cluster_tiles {
+    label="Example: Block (i=3, j=7) → C[3,7] Tile Accumulation Path";
+    color=gray; style=dashed;
+
+    Ablk [label="A[3,k]\n256×256 Tile Stream", fillcolor="#FFF6E0"];
+    Bblk [label="B[k,7]\n256×256 Tile Stream", fillcolor="#FFF6E0"];
+    MAC [label="Tile-level GEMM\nC[3,7] += A[3,k]×B[k,7]\n16×16 microkernel\n(Pipelined Multiply-Accumulate)", fillcolor=lightgray];
+    ACC [label="Accumulator C[3,7]\n256×256 FP32 Tile", fillcolor="#E8F3FF"];
+
+    Ablk -> MAC;
+    Bblk -> MAC;
+    MAC -> ACC;
+  }
+
+  A -> Ablk [style=dashed, label="Tile fetch (DMA/cache)"];
+  B -> Bblk [style=dashed, label="Tile fetch (DMA/cache)"];
+  ACC -> C [style=dashed, label="Tile store"];
+
+  // --- Bottom note ---
+  NOTE [shape=note, fontsize=9,
+    label="Inside each 256×256 tile:\n• Microkernel (16×16) computes partial sums per loop\n• K dimension (16 blocks) accumulates sequentially\n• Data reuse via local SRAM or register file\n• Scheduling: loop over k=0..15"];
+  C -> NOTE [style=invis];
+}

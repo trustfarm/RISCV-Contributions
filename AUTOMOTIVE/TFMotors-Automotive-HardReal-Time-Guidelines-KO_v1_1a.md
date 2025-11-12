@@ -23,7 +23,42 @@
 
 ---
 
-## 2️⃣ 강화 스펙 달성 필수 조건 (미준수 시 인증 불가)
+## 1️⃣-2️⃣ 2차 안전 시스템 (Secondary Safety)
+→ **망가져도 사람은 안 죽음** *(단, 보험료·품질 리스크 존재)*
+→ **Failure won’t kill people**, but may raise insurance or quality costs.
+
+| 시스템 / System | ASIL | 비고 / Notes |
+|----------------|------|--------------|
+| **FCW (Forward Collision Warning)** | B | Alerts only – driver or 1st-tier ECU executes control. |
+| **LDW/LKA (Lane Departure Warn/Keep)** | B | Assistive only; driver override possible. |
+| **ACC (Adaptive Cruise Control)** | B | Operates with 1st-tier brake/steer domain isolation. |
+| **BSM (Blind-Spot Monitor)** | QM | Indicator based – false/missed alerts → minor risk. |
+
+---
+
+## 1️⃣-3️⃣ 3차 안전 시스템 (Tertiary / Convenience)
+→ **망가져도 아무도 안 죽음** *(브랜드 신뢰도는 떨어짐)*
+→ **Failure non-fatal**, but damages brand trust and UX.
+
+| 시스템 / System | ASIL | 팩트 기반 비고 / Fact-checked Notes |
+|------------------|------|----------------------------------|
+| **FSD / Highway Pilot (Level 2+)** | QM | All current systems require hands-on & driver supervision by law. |
+| **Remote / Auto Parking** | QM | Low-speed collision risk; insurable damage only. |
+| **OTA Update** | QM | Update failures may disable non-HRT modules temporarily; HRT domain must remain isolated. |
+
+---
+## 2️⃣ 계층적 안전 모델
+
+| 계층 | 역할 / 목표 | 대표 기능 | 실시간성 요구 | ASIL 등급 | 비고 |
+|------|--------------|------------|----------------|------------|------|
+| **1차 안전 (Hard RT Domain)** | 생명 보호 / 기본 주행 안전 | Brake, Steer, Airbag | **INT→반응 ≤ 0.2 ms**<br>**루프 ≤ 1 ms** | C ~ D | Hypervisor 금지, RTOS 전용 |
+| **2차 보조 (Soft RT Domain)** | 주행 안정 및 ADAS 보조 | ACC, LKA, ADAS Core | 10 ~ 100 ms | B ~ C | Hypervisor 허용 |
+| **3차 편의 (Non-RT Domain)** | 인포테인먼트 및 커넥티비티 | IVI, HUD, V2X Link | > 100 ms | QM | Linux/AP 기반 |
+
+---
+
+
+## 3️⃣ 강화 스펙 달성 필수 조건 (미준수 시 인증 불가)
 
 | 항목 | 요구사항 | 비고 |
 |------|-----------|------|
@@ -37,15 +72,6 @@
 
 ---
 
-## 3️⃣ 계층적 안전 모델
-
-| 계층 | 역할 / 목표 | 대표 기능 | 실시간성 요구 | ASIL 등급 | 비고 |
-|------|--------------|------------|----------------|------------|------|
-| **1차 안전 (Hard RT Domain)** | 생명 보호 / 기본 주행 안전 | Brake, Steer, Airbag | **INT→반응 ≤ 0.2 ms**<br>**루프 ≤ 1 ms** | C ~ D | Hypervisor 금지, RTOS 전용 |
-| **2차 보조 (Soft RT Domain)** | 주행 안정 및 ADAS 보조 | ACC, LKA, ADAS Core | 10 ~ 100 ms | B ~ C | Hypervisor 허용 |
-| **3차 편의 (Non-RT Domain)** | 인포테인먼트 및 커넥티비티 | IVI, HUD, V2X Link | > 100 ms | QM | Linux/AP 기반 |
-
----
 
 ## 4️⃣ 설계 및 검증 지침
 
@@ -76,13 +102,6 @@
 
 ---
 
-**TFMotors DivPlanning. — Safety-Critical Systems Division**  
-문의: trustfarm.info@gmail.com
-(본 문서는 2025-11-12 기준 TFMotors Automotive HRT Guidelines Ver. 1.1 임)
-
-
----
-
 ## 📎 Appendix A — 역사적 경고 사례 / Historical Warning Case
 
 ### 🚨 Toyota 대규모 리콜 사태 (2009–2011)
@@ -110,3 +129,20 @@
 - [Wikipedia: 2009–2011 Toyota Vehicle Recalls](https://en.wikipedia.org/wiki/2009%E2%80%932011_Toyota_vehicle_recalls)
 - [ABC News: Toyota to Pay $1.2B for Hiding Deadly Unintended Acceleration](https://abcnews.go.com/Blotter/toyota-pay-12b-hiding-deadly-unintended-acceleration/story?id=22972214)
 - [Investopedia: How Do Recalls Affect a Company?](https://www.investopedia.com/articles/investing/010815/how-do-recalls-affect-company.asp)
+
+
+## References
+- NHTSA Consumer Alert (2023‑09‑27): “Kia and Hyundai — Park Outside.”  
+- Reuters (2023‑09‑27): “Kia, Hyundai recall 3.37M US vehicles over fire risks.”  
+- NHTSA Recalls 24V‑653 / 24V‑415 (ABS SW → ESC disable risk).  
+- Car and Driver (2023): “BMW iX Cruise Control Recall.” + NHTSA 23V‑409.  
+- NHTSA 21V‑472 (GM Airbag SDM Calibration Error).  
+- Reuters / The Verge (2024‑10‑08): Porsche Taycan Battery Short Circuit Risk.  
+- Euro NCAP (2024): Kia EV9 — Pedestrian/VRU score 76%.  
+- Wikipedia: 2009–2011 Toyota Vehicle Recalls; ABC News (2014 $1.2B settlement); Investopedia on recall impact.
+
+---
+**TFMotors DivPlanning. — Safety-Critical Systems Division**  
+문의: trustfarm.info@gmail.com
+(본 문서는 2025-11-12 기준 TFMotors Automotive HRT Guidelines Ver. 1.1 임)
+

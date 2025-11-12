@@ -9,7 +9,7 @@
 
 ---
 
-## 1) Primary Safety (Tier‑1, Hard Real‑Time Domain)
+## 1. Primary Safety (Tier‑1, Hard Real‑Time Domain)
 → Failure in any of these = **Immediate rolling coffin** (existential company risk)
 
 ### HRT Limits (TFMotors 1/5‑Tightened Targets)
@@ -28,7 +28,7 @@
 
 ---
 
-## 2) Secondary Safety (Tier‑2, Soft RT Assist)
+## 1-2. Secondary Safety (Tier‑2, Soft RT Assist)
 → Failure **won’t kill people**, but raises insurance/quality risk
 
 | System | ASIL | Notes |
@@ -40,7 +40,7 @@
 
 ---
 
-## 3) Tertiary / Convenience (Non‑RT)
+## 1-3. Tertiary / Convenience (Non‑RT)
 → Failure is **non‑fatal**, but hurts brand trust and UX
 
 | System | ASIL | Fact‑checked Notes |
@@ -50,8 +50,30 @@
 | **OTA Update** | QM | Update failures may temporarily disable non‑HRT modules; **HRT domain must be physically/logically isolated**. |
 
 ---
+## 2. Hierarchical Safety Model
 
-## 4) Verified Recalls & Incidents (Delay Not Disclosed; Models Masked)
+| Tier                                      | Role / Objective                      | Representative Functions | Real-Time Requirement                                  | ASIL Level | Remarks                                 |
+| ----------------------------------------- | ------------------------------------- | ------------------------ | ------------------------------------------------------ | ---------- | --------------------------------------- |
+| **Primary Safety (Hard RT Domain)**       | Life protection / core driving safety | Brake, Steer, Airbag     | **INT → Response ≤ 0.2 ms**<br>**Control loop ≤ 1 ms** | C ~ D      | Hypervisor prohibited; RTOS-only domain |
+| **Secondary Assistance (Soft RT Domain)** | Driving stability & ADAS support      | ACC, LKA, ADAS Core      | 10 ~ 100 ms                                            | B ~ C      | Hypervisor permitted                    |
+| **Tertiary Convenience (Non-RT Domain)**  | Infotainment & connectivity           | IVI, HUD, V2X Link       | > 100 ms                                               | QM         | Linux / Application-OS based            |
+
+---
+
+## 3. Design & Verification Guidelines
+
+1. **Primary HRT domain must reside on a dedicated RTOS or MCU core.**
+   Hypervisor or virtualized scheduling **is strictly prohibited**.
+2. **Contractual timing:** Document **INT → Response ≤ 0.2 ms**, **End-to-End ≤ 1 ms** at the RTE / BSW level.
+3. **Fail-safe mechanical priority + software assist** principle must always hold.
+4. **Ensure full hardware resource isolation** so Tier-2 / Tier-3 functions never interfere with Tier-1 scheduling.
+5. **Upon HRT violation detection, immediately enter Safe State → trigger recall and vehicle disposal.**
+6. **Include hardware performance validation (INT response ≤ 200 µs)** in all End-of-Line (EOL) production tests.
+7. **Prohibit OTA software updates** during any active RTOS session in the Tier-1 (HRT) domain.
+
+---
+
+## 4. Verified Recalls & Incidents (Delay Not Disclosed; Models Masked)
 — **Compliance‑safe table** with masked models and official sources only
 
 | No. | Model (Masked) | Delay | Issue Summary | Official Source |
@@ -66,7 +88,7 @@
 
 ---
 
-## 6) One‑Line Summary Variants
+## 5. One‑Line Summary Variants
 
 | Use | EN Message |
 |---|---|

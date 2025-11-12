@@ -65,3 +65,7 @@ This repository includes several documents and materials for RISC-V contribution
 
   - [RISC-V Memory Encryption Proposal (Draft v0.1) (KO)](TEE/RISCV_Memory_Encryption_uArch_(draft)_KO_V_0_1.md)
   - [RISC-V Memory Encryption Proposal (Draft v0.1) (EN)](TEE/RISCV_Memory_Encryption_uArch_(draft)_EN_V_0_1.md)
+
+## AUTOMOTIVE Section
+  - [TFMotors-Automotive-HardReal-Time-Guidelines-KO](AUTOMOTIVE/TFMotors-Automotive-HardReal-Time-Guidelines-KO_v1_1a.md)
+  - [TFMotors-Automotive-HardReal-Time-Guidelines-EN](AUTOMOTIVE/TFMotors-Automotive-HardReal-Time-Guidelines-EN_v1_1a.md)
